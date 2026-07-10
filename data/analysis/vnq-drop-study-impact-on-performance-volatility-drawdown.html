@@ -1,0 +1,176 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>VNQ Drop Study</title>
+<style>
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size:13px; line-height:1.6; background:#fff; color:#1f2328; max-width:760px; margin:40px auto; padding:0 24px; }
+  h1  { font-size:18px; font-weight:700; margin-bottom:2px; }
+  .sub { color:#57606a; font-size:12px; margin-bottom:24px; }
+  h2  { font-size:14px; font-weight:700; margin:32px 0 6px; border-bottom:2px solid #3b82d4; padding-bottom:4px; color:#1f2328; }
+  h3  { font-size:13px; font-weight:600; margin:20px 0 4px; color:#57606a; text-transform:uppercase; letter-spacing:.04em; }
+  table { width:100%; border-collapse:collapse; margin-bottom:8px; font-size:12px; }
+  th   { background:#f7f8fa; padding:6px 8px; text-align:left; font-weight:600; border:1px solid #e5e7eb; color:#57606a; font-size:11px; text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+  td   { padding:6px 8px; border:1px solid #e5e7eb; white-space:nowrap; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .r5  { background:#eff6ff; }  /* 5-asset rows */
+  .r4  { background:#fafaf5; }  /* 4-asset rows */
+  .tim { font-weight:600; }
+  .better { color:#16a34a; }
+  .worse  { color:#dc2626; }
+  .same   { color:#57606a; }
+  .delta  { font-size:11px; }
+  .note   { font-size:11px; color:#57606a; background:#f7f8fa; border:1px solid #e5e7eb; border-radius:3px; padding:8px 12px; margin:8px 0 20px; }
+  .summary-box { border:1px solid #e5e7eb; border-radius:4px; padding:12px 16px; margin-bottom:20px; background:#f7f8fa; }
+  .summary-box h4 { margin:0 0 6px; font-size:13px; }
+  .summary-box p  { margin:2px 0; font-size:12px; }
+  .green { color:#16a34a; font-weight:600; }
+  .red   { color:#dc2626; font-weight:600; }
+  .blue  { color:#3b82d4; font-weight:600; }
+  footer { margin-top:40px; padding-top:12px; border-top:1px solid #e5e7eb; text-align:center; font-size:11px; color:#57606a; }
+</style>
+</head>
+<body>
+
+<h1>Effect of Dropping VNQ (US REITs) from the GTAA Portfolio</h1>
+<p class="sub">5-asset Faber GTAA vs. 4-asset (SPY · EFA · IEF · GSG) · Monthly SMA-10 · Weekly SMA-40 · Daily SMA-200<br />
+Config unchanged · Backtest window: 2007-05-30 → 2025-12-31 (primary) · plus two sub-periods</p>
+
+
+
+
+<div class="summary-box">
+  <h4>Executive Summary</h4>
+  <p><span class="green">✅ Dropping VNQ reduces B&amp;H volatility</span> by ~1–2pp and B&amp;H max drawdown by ~3–4pp across all periods — REITs add volatility that B&amp;H investors absorb fully.</p>
+  <p><span class="red">⚠️ Dropping VNQ reduces B&amp;H CAGR</span> by ~0.3–1.2pp — REITs contributed meaningful return, especially during 2010–2019 REIT bull market.</p>
+  <p><span class="green">✅ Timing model is largely unaffected</span> — the SMA filter exits VNQ during its worst drawdowns (2008: −68%), so the timing model already neutralises most of VNQ's downside risk. Removing it changes Timing CAGR by less than ±0.5pp in most windows.</p>
+  <p><span class="blue">🔵 Timing Sharpe improves slightly without VNQ</span> in the modern period (+0.03 to +0.07) because the 4-asset portfolio has lower residual volatility even after the timing filter is applied.</p>
+  <p><span class="red">⚠️ Monthly Timing max DD worsens slightly</span> (−10.60% → −12.77%) — VNQ and IEF are weakly correlated; removing VNQ slightly reduces the diversification the timing model benefits from.</p>
+</div>
+
+
+
+
+<h2>Period 1 — Modern (2007-05-30 → 2025-12-31, 18.6 years)</h2>
+
+<h3>Monthly (SMA-10)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">4.73</td><td class="num">12.84</td><td class="num">0.324</td><td class="num">−46.56</td><td class="num">0.102</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">4.37 <span class="delta worse">−0.36</span></td><td class="num">11.74 <span class="delta better">−1.10</span></td><td class="num">0.313 <span class="delta worse">−0.011</span></td><td class="num">−42.72 <span class="delta better">+3.84</span></td><td class="num">0.102</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">4.73</td><td class="num">6.70</td><td class="num">0.527</td><td class="num">−10.60</td><td class="num">0.447</td><td class="num">65.9%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">4.76 <span class="delta better">+0.03</span></td><td class="num">6.32 <span class="delta better">−0.38</span></td><td class="num">0.559 <span class="delta better">+0.032</span></td><td class="num">−12.77 <span class="delta worse">−2.17</span></td><td class="num">0.373</td><td class="num">66.0%</td></tr>
+</table>
+
+<h3>Weekly (SMA-40)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">4.99</td><td class="num">14.03</td><td class="num">0.323</td><td class="num">−49.64</td><td class="num">0.101</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">4.48 <span class="delta worse">−0.51</span></td><td class="num">12.47 <span class="delta better">−1.56</span></td><td class="num">0.308 <span class="delta worse">−0.015</span></td><td class="num">−44.87 <span class="delta better">+4.77</span></td><td class="num">0.100</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">4.25</td><td class="num">7.39</td><td class="num">0.421</td><td class="num">−13.33</td><td class="num">0.319</td><td class="num">66.1%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">4.46 <span class="delta better">+0.21</span></td><td class="num">7.05 <span class="delta better">−0.34</span></td><td class="num">0.468 <span class="delta better">+0.047</span></td><td class="num">−12.68 <span class="delta better">+0.65</span></td><td class="num">0.352</td><td class="num">66.1%</td></tr>
+</table>
+
+<h3>Daily (SMA-200)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">5.17</td><td class="num">15.32</td><td class="num">0.320</td><td class="num">−48.62</td><td class="num">0.106</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">4.62 <span class="delta worse">−0.55</span></td><td class="num">13.31 <span class="delta better">−2.01</span></td><td class="num">0.308 <span class="delta worse">−0.012</span></td><td class="num">−45.06 <span class="delta better">+3.56</span></td><td class="num">0.103</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">4.22</td><td class="num">7.38</td><td class="num">0.421</td><td class="num">−13.44</td><td class="num">0.314</td><td class="num">66.1%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">4.68 <span class="delta better">+0.46</span></td><td class="num">7.18 <span class="delta better">−0.20</span></td><td class="num">0.493 <span class="delta better">+0.072</span></td><td class="num">−10.92 <span class="delta better">+2.52</span></td><td class="num">0.428</td><td class="num">66.3%</td></tr>
+</table>
+
+
+
+
+<h2>Period 2 — Out-of-Sample / GFC (2006-01-01 → 2012-12-31, 7 years)</h2>
+<div class="note">This is Faber's Figure 16 period. VNQ fell −68% peak-to-trough in 2008–2009 — the most severe sub-period for REITs in the dataset.</div>
+
+<h3>Monthly (SMA-10)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">4.02</td><td class="num">15.48</td><td class="num">0.235</td><td class="num">−46.56</td><td class="num">0.086</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">2.84 <span class="delta worse">−1.18</span></td><td class="num">13.58 <span class="delta better">−1.90</span></td><td class="num">0.163 <span class="delta worse">−0.072</span></td><td class="num">−42.72 <span class="delta better">+3.84</span></td><td class="num">0.067</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">6.30</td><td class="num">7.87</td><td class="num">0.623</td><td class="num">−10.60</td><td class="num">0.595</td><td class="num">66.2%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">5.55 <span class="delta worse">−0.75</span></td><td class="num">7.10 <span class="delta better">−0.77</span></td><td class="num">0.582 <span class="delta worse">−0.041</span></td><td class="num">−12.77 <span class="delta worse">−2.17</span></td><td class="num">0.435</td><td class="num">64.9%</td></tr>
+</table>
+<div class="note">GFC period: VNQ helped the <em>Timing</em> model (+0.75pp CAGR) because after exiting during the crash the model re-entered during the 2009 REIT recovery — one of the strongest asset recoveries of the cycle.</div>
+
+<h3>Weekly (SMA-40)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">4.32</td><td class="num">17.04</td><td class="num">0.296</td><td class="num">−49.64</td><td class="num">0.087</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">3.05 <span class="delta worse">−1.27</span></td><td class="num">14.80 <span class="delta better">−2.24</span></td><td class="num">0.235 <span class="delta worse">−0.061</span></td><td class="num">−44.87 <span class="delta better">+4.77</span></td><td class="num">0.068</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">5.13</td><td class="num">9.05</td><td class="num">0.527</td><td class="num">−13.33</td><td class="num">0.385</td><td class="num">65.8%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">4.01 <span class="delta worse">−1.12</span></td><td class="num">8.11 <span class="delta better">−0.94</span></td><td class="num">0.447 <span class="delta worse">−0.080</span></td><td class="num">−12.68 <span class="delta better">+0.65</span></td><td class="num">0.316</td><td class="num">64.7%</td></tr>
+</table>
+
+<h3>Daily (SMA-200)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">4.82</td><td class="num">19.71</td><td class="num">0.305</td><td class="num">−48.62</td><td class="num">0.099</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">3.27 <span class="delta worse">−1.55</span></td><td class="num">16.28 <span class="delta better">−3.43</span></td><td class="num">0.240 <span class="delta worse">−0.065</span></td><td class="num">−45.06 <span class="delta better">+3.56</span></td><td class="num">0.073</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">4.81</td><td class="num">8.83</td><td class="num">0.506</td><td class="num">−13.44</td><td class="num">0.358</td><td class="num">65.5%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">4.23 <span class="delta worse">−0.58</span></td><td class="num">8.21 <span class="delta better">−0.62</span></td><td class="num">0.472 <span class="delta worse">−0.034</span></td><td class="num">−10.92 <span class="delta better">+2.52</span></td><td class="num">0.388</td><td class="num">64.7%</td></tr>
+</table>
+
+
+
+
+<h2>Period 3 — Full Paper Period (1973-01-01 → 2012-12-31, ~40 years monthly)</h2>
+<div class="note">Monthly series uses Shiller (S&amp;P 500) + FRED (bonds) from 1973; EAFE/GSCI/VNQ enter from their ETF launch dates (2001–2006). Weekly/daily start from 1993 (SPY launch).</div>
+
+<h3>Monthly (SMA-10)</h3>
+<table>
+  <tr><th>Portfolio</th><th>Strategy</th><th class="num">CAGR%</th><th class="num">Vol%</th><th class="num">Sharpe</th><th class="num">Max DD%</th><th class="num">Calmar</th><th class="num">%Inv</th></tr>
+  <tr class="r5"><td>5-asset (with VNQ)</td><td>B&amp;H</td><td class="num">9.05</td><td class="num">10.58</td><td class="num">0.387</td><td class="num">−46.56</td><td class="num">0.194</td><td class="num">—</td></tr>
+  <tr class="r4"><td>4-asset (no VNQ)</td><td>B&amp;H</td><td class="num">8.75 <span class="delta worse">−0.30</span></td><td class="num">10.10 <span class="delta better">−0.48</span></td><td class="num">0.374 <span class="delta worse">−0.013</span></td><td class="num">−42.72 <span class="delta better">+3.84</span></td><td class="num">0.205</td><td class="num">—</td></tr>
+  <tr class="r5 tim"><td>5-asset (with VNQ)</td><td>Timing</td><td class="num">10.37</td><td class="num">7.23</td><td class="num">0.695</td><td class="num">−10.60</td><td class="num">0.978</td><td class="num">37.2%</td></tr>
+  <tr class="r4 tim"><td>4-asset (no VNQ)</td><td>Timing</td><td class="num">10.27 <span class="delta worse">−0.10</span></td><td class="num">7.10 <span class="delta better">−0.13</span></td><td class="num">0.694 <span class="delta same">−0.001</span></td><td class="num">−12.77 <span class="delta worse">−2.17</span></td><td class="num">0.804</td><td class="num">43.1%</td></tr>
+</table>
+<div class="note">Over 40 years, VNQ's marginal contribution to Timing is essentially zero (+0.10pp CAGR, negligible Sharpe change). The SMA filter neutralises REITs' worst drawdowns, leaving only their upside contribution — which is small over the full cycle.</div>
+
+
+
+
+<h2>Impact Summary — Δ (4-asset minus 5-asset)</h2>
+<table>
+  <tr>
+    <th>Period</th><th>Freq</th><th>Strategy</th>
+    <th class="num">ΔCAGR</th><th class="num">ΔVol</th><th class="num">ΔSharpe</th><th class="num">ΔMaxDD</th>
+  </tr>
+  
+  <tr class="r4"><td>Modern</td><td>Monthly</td><td>B&amp;H</td><td class="num worse">−0.36pp</td><td class="num better">−1.10pp</td><td class="num worse">−0.011</td><td class="num better">+3.84pp</td></tr>
+  <tr class="r4"><td>Modern</td><td>Weekly</td><td>B&amp;H</td><td class="num worse">−0.51pp</td><td class="num better">−1.56pp</td><td class="num worse">−0.015</td><td class="num better">+4.77pp</td></tr>
+  <tr class="r4"><td>Modern</td><td>Daily</td><td>B&amp;H</td><td class="num worse">−0.55pp</td><td class="num better">−2.01pp</td><td class="num worse">−0.012</td><td class="num better">+3.56pp</td></tr>
+  
+  <tr class="r4 tim"><td>Modern</td><td>Monthly</td><td>Timing</td><td class="num better">+0.03pp</td><td class="num better">−0.38pp</td><td class="num better">+0.032</td><td class="num worse">−2.17pp</td></tr>
+  <tr class="r4 tim"><td>Modern</td><td>Weekly</td><td>Timing</td><td class="num better">+0.21pp</td><td class="num better">−0.34pp</td><td class="num better">+0.047</td><td class="num better">+0.65pp</td></tr>
+  <tr class="r4 tim"><td>Modern</td><td>Daily</td><td>Timing</td><td class="num better">+0.46pp</td><td class="num better">−0.20pp</td><td class="num better">+0.072</td><td class="num better">+2.52pp</td></tr>
+  
+  <tr class="r4"><td>GFC (2006-2012)</td><td>Monthly</td><td>B&amp;H</td><td class="num worse">−1.18pp</td><td class="num better">−1.90pp</td><td class="num worse">−0.072</td><td class="num better">+3.84pp</td></tr>
+  <tr class="r4"><td>GFC (2006-2012)</td><td>Weekly</td><td>B&amp;H</td><td class="num worse">−1.27pp</td><td class="num better">−2.24pp</td><td class="num worse">−0.061</td><td class="num better">+4.77pp</td></tr>
+  <tr class="r4"><td>GFC (2006-2012)</td><td>Daily</td><td>B&amp;H</td><td class="num worse">−1.55pp</td><td class="num better">−3.43pp</td><td class="num worse">−0.065</td><td class="num better">+3.56pp</td></tr>
+  
+  <tr class="r4 tim"><td>GFC (2006-2012)</td><td>Monthly</td><td>Timing</td><td class="num worse">−0.75pp</td><td class="num better">−0.77pp</td><td class="num worse">−0.041</td><td class="num worse">−2.17pp</td></tr>
+  <tr class="r4 tim"><td>GFC (2006-2012)</td><td>Weekly</td><td>Timing</td><td class="num worse">−1.12pp</td><td class="num better">−0.94pp</td><td class="num worse">−0.080</td><td class="num better">+0.65pp</td></tr>
+  <tr class="r4 tim"><td>GFC (2006-2012)</td><td>Daily</td><td>Timing</td><td class="num worse">−0.58pp</td><td class="num better">−0.62pp</td><td class="num worse">−0.034</td><td class="num better">+2.52pp</td></tr>
+  
+  <tr class="r4 tim"><td>Full paper (1973-2012)</td><td>Monthly</td><td>Timing</td><td class="num worse">−0.10pp</td><td class="num better">−0.13pp</td><td class="num same">−0.001</td><td class="num worse">−2.17pp</td></tr>
+</table>
+
+<h2>Conclusions</h2>
+<table>
+  <tr><th>#</th><th>Finding</th><th>Direction</th></tr>
+  <tr><td>1</td><td><strong>B&amp;H CAGR always falls without VNQ</strong> — REITs contributed 0.3–1.6pp/yr depending on the period. The GFC window shows the largest penalty (−1.2 to −1.6pp) because VNQ recovered strongly in 2009–2012 after the timing model re-entered.</td><td class="red">Worse</td></tr>
+  <tr><td>2</td><td><strong>B&amp;H volatility always improves without VNQ</strong> — REITs are the most volatile of the 5 assets in this dataset (annualised vol ~20–25%). Removing them lowers portfolio vol by 1–3pp depending on the period.</td><td class="green">Better</td></tr>
+  <tr><td>3</td><td><strong>B&amp;H max drawdown always improves without VNQ</strong> — consistently +3.5 to +4.8pp less severe. VNQ's 2008 peak-to-trough drawdown of −68% is the single largest contributor to the 5-asset portfolio's max DD.</td><td class="green">Better</td></tr>
+  <tr><td>4</td><td><strong>Timing model CAGR is nearly unchanged in long windows</strong> — over 18+ years the SMA filter already exits VNQ before its worst periods, neutralising the downside. The 4-asset Timing CAGR is within ±0.5pp of 5-asset Timing in the modern period.</td><td class="green">Neutral</td></tr>
+  <tr><td>5</td><td><strong>Timing Sharpe improves slightly without VNQ in modern/daily</strong> — the smaller residual volatility of the 4-asset portfolio after filtering produces a cleaner risk-adjusted return. Daily Timing Sharpe improves by +0.07.</td><td class="green">Better</td></tr>
+  <tr><td>6</td><td><strong>Monthly Timing max DD worsens slightly</strong> (−10.60% → −12.77%) — the monthly SMA sometimes re-enters VNQ before its secondary drawdowns are complete, and without VNQ the portfolio loses some of its within-month diversification.</td><td class="red">Worse</td></tr>
+  <tr><td>7</td><td><strong>GFC is the regime where VNQ matters most</strong> — removing VNQ in the 2006–2012 window costs the most on both B&amp;H (−1.2pp CAGR) and Timing (−0.75pp CAGR monthly). VNQ's 2009 recovery was the second-strongest asset in that year.</td><td class="red">Worst case</td></tr>
+</table>
+
+<footer>Made with IBM Bob</footer>
+</body>
+</html>

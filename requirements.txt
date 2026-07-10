@@ -1,0 +1,10 @@
+yfinance==1.5.1
+pandas==2.1.4
+numpy==1.26.4
+quantstats==0.0.81
+matplotlib==3.10.9
+PyYAML==6.0.2
+pandas-datareader==0.10.0
+requests==2.32.2
+openpyxl==3.1.5
+xlrd==2.0.2

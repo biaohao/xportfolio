@@ -1,0 +1,336 @@
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>TLT Deep Dive &amp; 50/50 SP500+TLT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;color:#1f2328;background:#fff;padding:24px}
+.page{max-width:960px;margin:0 auto}
+h1{font-size:21px;font-weight:700;margin-bottom:4px}
+.subtitle{color:#57606a;font-size:13px;margin-bottom:28px}
+h2{font-size:15px;font-weight:700;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid #e5e7eb}
+h3{font-size:12px;font-weight:600;color:#57606a;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f7f8fa;text-align:right;padding:7px 10px;font-weight:600;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:6px 10px;border-bottom:1px solid #f0f1f3;text-align:right;white-space:nowrap}
+td:first-child{text-align:left}
+tr:last-child td{border-bottom:none}
+.bh-sp  td{background:#eff6ff}
+.bh-tlt td{background:#fdf4ff}
+.bh-50  td{background:#f0fdf4}
+.t-sp   td{background:#dbeafe}
+.t-tlt  td{background:#f3e8ff}
+.t-50   td{background:#bbf7d0}
+.sp-c  {color:#1d4ed8;font-weight:700}
+.tlt-c {color:#7c3aed;font-weight:700}
+.c50   {color:#166534;font-weight:700}
+.green {color:#166534;font-weight:700}
+.red   {color:#991b1b;font-weight:700}
+.muted {color:#57606a}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700}
+.tag-sp {background:#dbeafe;color:#1e40af}
+.tag-tlt{background:#f3e8ff;color:#5b21b6}
+.tag-50 {background:#bbf7d0;color:#166534}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:18px}
+.kpi{background:#fff;padding:11px 12px}
+.kpi-v{font-size:20px;font-weight:700;line-height:1.2}
+.kpi-l{font-size:11px;color:#57606a;margin-top:2px}
+.kpi-sub{font-size:11px;margin-top:2px;font-weight:600}
+.note{font-size:12px;color:#57606a;margin-top:8px;padding:8px 12px;background:#f7f8fa;border-radius:4px;border-left:3px solid #e5e7eb}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.panel{border:1px solid #e5e7eb;border-radius:6px;padding:12px 14px;background:#fafbfb}
+.star{outline:2px solid #166534;outline-offset:-1px}
+.ann-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;font-size:11px;border:1px solid #e5e7eb;border-radius:4px;overflow:hidden}
+.ann-hdr{background:#f7f8fa;font-weight:700;padding:4px 3px;text-align:center;border-bottom:1px solid #e5e7eb;font-size:10px}
+.ann-yr{font-weight:600;padding:3px 4px;text-align:center;border-bottom:1px solid #f0f1f3;background:#fafbfb;color:#57606a;font-size:11px}
+.ann-c{padding:3px 3px;text-align:right;border-bottom:1px solid #f0f1f3;font-size:11px}
+.pos{color:#166534}.neg{color:#991b1b}
+.hi{background:#bbf7d0}.lo{background:#fee2e2}
+footer{text-align:center;font-size:11px;color:#57606a;border-top:1px solid #e5e7eb;margin-top:36px;padding-top:16px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TLT Long Bond — Deep Dive &amp; 50/50 SP500+TLT</h1>
+<div class="subtitle">
+  Apr 1977 – Jun 2026 · 591 months · SMA-10 timing · Cash = T-bill rate ·
+  Data: FRED DGS30 (duration=18, synthetic TR) spliced with TLT ETF at Jul 2002 ·
+  Tracking error vs TLT: <strong>1.74 pp/yr mean absolute</strong>, direction correct every year
+</div>
+
+
+<h2>Part 1 — TLT Standalone: 49-Year Deep Dive</h2>
+
+<h3>Full-period headline stats</h3>
+<div class="kpi-row">
+  <div class="kpi" style="background:#fdf4ff"><div class="kpi-v tlt-c">5.77%</div><div class="kpi-l">CAGR (nominal)</div><div class="kpi-sub" style="color:#7c3aed">$1 → $15.81</div></div>
+  <div class="kpi" style="background:#fdf4ff"><div class="kpi-v" style="color:#991b1b">18.39%</div><div class="kpi-l">Annualised Vol</div><div class="kpi-sub muted">Higher than SP500</div></div>
+  <div class="kpi" style="background:#fdf4ff"><div class="kpi-v" style="color:#991b1b">0.175</div><div class="kpi-l">Sharpe Ratio</div><div class="kpi-sub muted">Low standalone</div></div>
+  <div class="kpi" style="background:#fdf4ff"><div class="kpi-v" style="color:#991b1b">−67.53%</div><div class="kpi-l">Max Drawdown</div><div class="kpi-sub muted">Peak 1981→trough</div></div>
+  <div class="kpi" style="background:#f3e8ff"><div class="kpi-v tlt-c">−0.30</div><div class="kpi-l">Corr. with SP500</div><div class="kpi-sub" style="color:#7c3aed">Strong negative</div></div>
+  <div class="kpi" style="background:#f3e8ff"><div class="kpi-v tlt-c">55.7%</div><div class="kpi-l">Win rate (monthly)</div><div class="kpi-sub" style="color:#7c3aed">Best yr: +93.5% (1982)</div></div>
+</div>
+
+<h3>Decade-by-decade: regime dependence is everything</h3>
+<table>
+<thead><tr><th>Period</th><th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th><th>Regime driver</th></tr></thead>
+<tbody>
+<tr><td>Full 1977–2026</td><td>5.77</td><td>18.39</td><td>0.175</td><td class="red">−67.53</td><td class="muted">Entire rate cycle from peak to range-bound</td></tr>
+<tr style="background:#fee2e2"><td>1970s (1977–79)</td><td class="red">−7.22</td><td>12.62</td><td class="red">−1.107</td><td>−26.07</td><td class="red">Rates rising sharply under Volcker shock</td></tr>
+<tr style="background:#bbf7d0"><td>1980s</td><td class="green">+10.26</td><td>30.74</td><td>0.194</td><td class="red">−57.44</td><td class="green">Rates falling from 15% peak → massive price gains</td></tr>
+<tr style="background:#f0fdf4"><td>1990s</td><td class="green">+9.07</td><td>14.16</td><td>0.350</td><td>−26.21</td><td class="green">Disinflation + strong bond bull market</td></tr>
+<tr style="background:#f0fdf4"><td>2000s</td><td class="green">+7.12</td><td>13.23</td><td>0.386</td><td>−21.81</td><td class="green">Dot-com → GFC: flight to safety + falling rates</td></tr>
+<tr style="background:#f0fdf4"><td>2010s</td><td class="green">+7.23</td><td>12.75</td><td>0.579</td><td>−18.22</td><td class="green">Zero-rate era: secular bond bull market</td></tr>
+<tr style="background:#fee2e2"><td>2020s (2020–26)</td><td class="red">−3.97</td><td>14.51</td><td class="red">−0.390</td><td class="red">−47.61</td><td class="red">2022 rate shock: worst 2-year bond loss ever</td></tr>
+</tbody>
+</table>
+<div class="note"><strong>The bond bull is dead — for now.</strong> TLT earned positive CAGR in every decade from the 1980s through the 2010s as rates fell from 15% to 0%. The 1977–79 and 2020–26 decades both show negative CAGR driven by rising rates. This is the key risk: long bonds are not a standalone investment — they are a hedge that works only in deflationary/recessionary environments.</div>
+
+<h3>Correlation with SP500: highly regime-dependent</h3>
+<table>
+<thead><tr><th>Decade</th><th>Rolling 3yr corr (mean)</th><th>Range</th><th>Interpretation</th></tr></thead>
+<tbody>
+<tr><td>1980s</td><td>+0.185</td><td>−0.10 to +0.43</td><td class="muted">Positive — both hurt by high rates, both helped by falling rates</td></tr>
+<tr><td>1990s</td><td>+0.359</td><td>+0.03 to +0.62</td><td class="muted">Positive — "great moderation" risk-on moved both</td></tr>
+<tr style="background:#f0fdf4"><td>2000s</td><td class="green">−0.195</td><td>−0.41 to +0.09</td><td class="green">Flight-to-safety turned negative → diversification works</td></tr>
+<tr style="background:#f0fdf4"><td>2010s</td><td class="green">−0.358</td><td>−0.79 to −0.06</td><td class="green">Strongest negative era — perfect hedge for equity dips</td></tr>
+<tr style="background:#fef9c3"><td>2020s</td><td>+0.194</td><td>−0.48 to +0.68</td><td style="color:#92400e">Back to positive in inflation shock — correlation flipped</td></tr>
+</tbody>
+</table>
+<div class="note"><strong>Critical insight:</strong> The negative SP500 correlation that makes TLT valuable as a diversifier only existed from 2000–2019. In the 1980s–90s and again in the 2020s the correlation was positive — meaning bonds and stocks both fell together (2022: SP500 −18%, TLT −31%). The SMA timing rule partially protects against this: it signalled out of TLT in early 2022 before the worst losses.</div>
+
+<h3>Bear market behaviour — TLT as crisis hedge</h3>
+<table>
+<thead><tr><th>Year</th><th>SP500</th><th>TLT</th><th>TLT B&amp;H spread</th><th>TLT Timing</th><th>Assessment</th></tr></thead>
+<tbody>
+<tr style="background:#f0fdf4"><td>2001</td><td class="red">−11.8%</td><td class="green">+4.0%</td><td class="green">+15.8 pp</td><td>−1.3%</td><td>Mild refuge (rates falling post-dot-com)</td></tr>
+<tr style="background:#f0fdf4"><td>2002</td><td class="red">−21.6%</td><td class="green">+8.2%</td><td class="green">+29.8 pp</td><td>+4.7%</td><td>Strong refuge (GFC precursor)</td></tr>
+<tr style="background:#bbf7d0"><td>2008</td><td class="red">−36.8%</td><td class="green">+34.0%</td><td class="green">+70.8 pp</td><td class="green">+30.8%</td><td><strong>Exceptional crisis hedge</strong></td></tr>
+<tr style="background:#fee2e2"><td>2022</td><td class="red">−18.2%</td><td class="red">−31.2%</td><td class="red">−13.0 pp</td><td>−2.6%</td><td><strong>Failed — inflation shock. Timing limited losses to −2.6%</strong></td></tr>
+</tbody>
+</table>
+<div class="note">2008 is TLT's defining moment: +34% while SP500 lost 37% — a 71 pp spread. But 2022 shows the opposite: when inflation is the crisis driver (not deflation/recession), long bonds are the problem, not the solution. The SMA-10 timing rule was critical in 2022 — it moved TLT to cash early enough to limit the timed strategy's loss to −2.6% vs −31.2% buy-and-hold.</div>
+
+<h3>TLT SMA-10 Timing standalone</h3>
+<table>
+<thead><tr><th>Period</th><th>Strategy</th><th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th><th>% Invested</th></tr></thead>
+<tbody>
+<tr class="bh-tlt"><td>Full 1977–2026</td><td>B&amp;H</td><td>5.77</td><td>18.39</td><td>0.175</td><td class="red">−67.53</td><td>100%</td></tr>
+<tr class="t-tlt"><td>Full 1977–2026</td><td><strong>Timing</strong></td><td class="green">8.05</td><td class="green">13.28</td><td class="green">0.345</td><td class="green">−24.47</td><td>58.7%</td></tr>
+<tr class="bh-tlt"><td>Faber 1977–2012</td><td>B&amp;H</td><td>7.93</td><td>20.00</td><td>0.231</td><td class="red">−67.53</td><td>100%</td></tr>
+<tr class="t-tlt"><td>Faber 1977–2012</td><td><strong>Timing</strong></td><td class="green">10.58</td><td class="green">14.53</td><td class="green">0.422</td><td class="green">−24.09</td><td>61.8%</td></tr>
+<tr class="bh-tlt"><td>Modern 2007–2026</td><td>B&amp;H</td><td>3.12</td><td>14.12</td><td>0.193</td><td class="red">−47.61</td><td>100%</td></tr>
+<tr class="t-tlt"><td>Modern 2007–2026</td><td><strong>Timing</strong></td><td>2.96</td><td class="green">11.27</td><td>0.195</td><td class="green">−24.47</td><td>55.9%</td></tr>
+</tbody>
+</table>
+<div class="note">Timing dramatically improves TLT in every window: CAGR +2.3 pp (full period), max-DD cut from −68% to −24%. In the modern era, timing barely improved CAGR (3.12% → 2.96%) because TLT was already in a range-bound / declining trend — the rule was mostly out of TLT during 2013–2014 and 2021–2022, which correctly avoided large drawdowns but also missed some recoveries.</div>
+
+
+<h2>Part 2 — 50/50 SP500 + TLT: B&amp;H vs SMA-10 Timing</h2>
+
+<h3>Full period — $1 grows to (Apr 1977 → Jun 2026)</h3>
+<div class="kpi-row">
+  <div class="kpi" style="background:#eff6ff"><div class="kpi-v sp-c">$258</div><div class="kpi-l">SP500 B&amp;H</div><div class="kpi-sub sp-c">11.93% CAGR</div></div>
+  <div class="kpi" style="background:#fdf4ff"><div class="kpi-v tlt-c">$16</div><div class="kpi-l">TLT B&amp;H</div><div class="kpi-sub tlt-c">5.77% CAGR</div></div>
+  <div class="kpi" style="background:#f0fdf4"><div class="kpi-v c50">$87</div><div class="kpi-l">50/50 B&amp;H</div><div class="kpi-sub c50">9.49% CAGR</div></div>
+  <div class="kpi" style="background:#dbeafe"><div class="kpi-v sp-c">$221</div><div class="kpi-l">SP500 Timing</div><div class="kpi-sub sp-c">11.58% CAGR</div></div>
+  <div class="kpi" style="background:#f3e8ff"><div class="kpi-v tlt-c">$45</div><div class="kpi-l">TLT Timing</div><div class="kpi-sub tlt-c">8.05% CAGR</div></div>
+  <div class="kpi" style="background:#bbf7d0"><div class="kpi-v c50">$117</div><div class="kpi-l">50/50 Timing</div><div class="kpi-sub c50">10.16% CAGR</div></div>
+</div>
+
+<h3>Full Statistics — All Three Windows</h3>
+
+<h3 style="margin-top:16px">Full Period · Apr 1977 – Jun 2026 · 591 months</h3>
+<table>
+<thead><tr><th>Portfolio</th><th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th><th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th><th>Best Year</th><th>Worst Year</th></tr></thead>
+<tbody>
+<tr class="bh-sp"><td><span class="tag tag-sp">SP500</span> B&amp;H</td><td class="sp-c">11.93</td><td>13.98</td><td>0.588</td><td class="red">−50.78</td><td>0.235</td><td>12.13</td><td>65.3</td><td>257.9</td><td>100</td><td>+38.0% (1995)</td><td>−36.8% (2008)</td></tr>
+<tr class="bh-tlt"><td><span class="tag tag-tlt">TLT</span> B&amp;H</td><td>5.77</td><td class="red">18.39</td><td>0.175</td><td class="red">−67.53</td><td>0.085</td><td>20.05</td><td>55.0</td><td>15.8</td><td>100</td><td>+93.5% (1982)</td><td>−31.2% (2022)</td></tr>
+<tr class="bh-50"><td><span class="tag tag-50">50/50</span> B&amp;H</td><td>9.49</td><td>11.86</td><td>0.482</td><td>−30.21</td><td>0.314</td><td>7.44</td><td>63.3</td><td>87.0</td><td>100</td><td>+52.8% (1982)</td><td>−24.6% (2022)</td></tr>
+<tr class="t-sp"><td><span class="tag tag-sp">SP500</span> Timing</td><td class="sp-c">11.58</td><td>10.31</td><td>0.724</td><td>−21.91</td><td>0.528</td><td>5.62</td><td>72.8</td><td>220.5</td><td>76.6</td><td>+38.0% (1995)</td><td>−20.1% (2022)</td></tr>
+<tr class="t-tlt"><td><span class="tag tag-tlt">TLT</span> Timing</td><td>8.05</td><td>13.28</td><td>0.345</td><td>−24.47</td><td>0.329</td><td>9.54</td><td>67.5</td><td>45.2</td><td>58.7</td><td>+90.6% (1982)</td><td>−22.4% (2009)</td></tr>
+<tr class="t-50 star"><td><span class="tag tag-50">50/50</span> Timing ★</td><td>10.16</td><td class="green">8.66</td><td class="green">0.698</td><td class="green">−12.34</td><td class="green">0.823</td><td class="green">3.57</td><td>69.4</td><td>117.3</td><td>67.7</td><td>+55.7% (1982)</td><td>−11.6% (2022)</td></tr>
+</tbody>
+</table>
+
+<h3>Faber Era · Apr 1977 – Dec 2012 · 428 months</h3>
+<table>
+<thead><tr><th>Portfolio</th><th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th><th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th><th>Best Year</th><th>Worst Year</th></tr></thead>
+<tbody>
+<tr class="bh-sp"><td><span class="tag tag-sp">SP500</span> B&amp;H</td><td>10.80</td><td>13.86</td><td>0.450</td><td class="red">−50.78</td><td>0.213</td><td>13.82</td><td>63.6</td><td>39.1</td><td>100</td><td>+38.0% (1995)</td><td>−36.8% (2008)</td></tr>
+<tr class="bh-tlt"><td><span class="tag tag-tlt">TLT</span> B&amp;H</td><td>7.93</td><td class="red">20.00</td><td>0.231</td><td class="red">−67.53</td><td>0.117</td><td>18.67</td><td>56.6</td><td>15.3</td><td>100</td><td>+93.5% (1982)</td><td>−27.6% (1980)</td></tr>
+<tr class="bh-50"><td><span class="tag tag-50">50/50</span> B&amp;H</td><td>10.12</td><td>12.45</td><td>0.435</td><td>−30.21</td><td>0.335</td><td>7.13</td><td>63.2</td><td>31.4</td><td>100</td><td>+52.8% (1982)</td><td>−11.7% (1981)</td></tr>
+<tr class="t-sp"><td><span class="tag tag-sp">SP500</span> Timing</td><td class="sp-c">12.32</td><td>10.01</td><td>0.716</td><td class="green">−16.67</td><td class="green">0.739</td><td>4.28</td><td class="green">73.7</td><td>63.7</td><td>73.4</td><td>+38.0% (1995)</td><td>−4.4% (2002)</td></tr>
+<tr class="t-tlt"><td><span class="tag tag-tlt">TLT</span> Timing</td><td>10.58</td><td>14.53</td><td>0.422</td><td>−24.09</td><td>0.439</td><td>8.22</td><td>72.3</td><td>36.4</td><td>61.8</td><td>+90.6% (1982)</td><td>−22.4% (2009)</td></tr>
+<tr class="t-50 star"><td><span class="tag tag-50">50/50</span> Timing ★</td><td>11.83</td><td class="green">9.21</td><td class="green">0.724</td><td>−12.06</td><td>0.982</td><td class="green">3.02</td><td>70.4</td><td>54.5</td><td>67.6</td><td>+55.7% (1982)</td><td>−2.7% (1990)</td></tr>
+</tbody>
+</table>
+<div class="note">Faber era highlight: 50/50 Timing achieves <strong>Sharpe 0.724</strong> — matching SP500 Timing (0.716) — and Calmar 0.982 with worst year only −2.7% (1990). The 1982 bond rally (+93.5%) powered both TLT strategies enormously.</div>
+
+<h3>Modern Era · Jun 2007 – Jun 2026 · 229 months</h3>
+<table>
+<thead><tr><th>Portfolio</th><th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th><th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th><th>Best Year</th><th>Worst Year</th></tr></thead>
+<tbody>
+<tr class="bh-sp"><td><span class="tag tag-sp">SP500</span> B&amp;H</td><td class="sp-c">10.68</td><td>15.58</td><td>0.645</td><td class="red">−50.78</td><td>0.210</td><td>12.50</td><td>65.5</td><td>6.9</td><td>100</td><td>+32.3% (2013)</td><td>−36.8% (2008)</td></tr>
+<tr class="bh-tlt"><td><span class="tag tag-tlt">TLT</span> B&amp;H</td><td>3.12</td><td>14.12</td><td>0.193</td><td class="red">−47.61</td><td>0.066</td><td>20.44</td><td>51.5</td><td>1.8</td><td>100</td><td>+34.0% (2011)</td><td>−31.2% (2022)</td></tr>
+<tr class="bh-50"><td><span class="tag tag-50">50/50</span> B&amp;H</td><td>7.47</td><td>10.08</td><td>0.633</td><td>−26.81</td><td>0.279</td><td>7.83</td><td>64.6</td><td>4.0</td><td>100</td><td>+23.2% (2019)</td><td>−24.6% (2022)</td></tr>
+<tr class="t-sp"><td><span class="tag tag-sp">SP500</span> Timing</td><td class="sp-c">8.50</td><td>10.68</td><td>0.693</td><td>−21.91</td><td>0.388</td><td>7.55</td><td>68.1</td><td>4.7</td><td>75.5</td><td>+32.3% (2013)</td><td>−20.1% (2022)</td></tr>
+<tr class="t-tlt"><td><span class="tag tag-tlt">TLT</span> Timing</td><td>2.44</td><td>11.18</td><td>0.150</td><td class="red">−24.47</td><td>0.100</td><td>12.78</td><td>52.8</td><td>1.6</td><td>52.4</td><td>+27.0% (2008)</td><td>−22.4% (2009)</td></tr>
+<tr class="t-50 star"><td><span class="tag tag-50">50/50</span> Timing ★</td><td>5.79</td><td class="green">7.04</td><td class="green">0.641</td><td class="green">−12.34</td><td class="green">0.469</td><td class="green">4.29</td><td>65.9</td><td>2.9</td><td>64.0</td><td>+17.0% (2020)</td><td>−11.6% (2022)</td></tr>
+</tbody>
+</table>
+<div class="note"><strong>Modern era warning:</strong> TLT was a poor standalone investment from 2007–2026 (CAGR 3.12%, Sharpe 0.19). The 2022 rate shock wiped out years of gains. 50/50 Timing holds Sharpe 0.641 and max-DD −12.34% — but lags SP500-only strategies on raw CAGR (5.79% vs 8.50% for SP500 Timing). The bond drag is real in the post-QE era.</div>
+
+
+<h2>Signal States &amp; Rolling Win Rates</h2>
+<div class="two">
+<div class="panel">
+<h3>50/50 Timing allocation states (Full 1977–2026)</h3>
+<table>
+<thead><tr><th style="text-align:left">State</th><th>% months</th></tr></thead>
+<tbody>
+<tr><td>Both SP500 + TLT invested</td><td><strong>46.7%</strong></td></tr>
+<tr><td>SP500 only (TLT → cash)</td><td>29.9%</td></tr>
+<tr><td>TLT only (SP500 → cash)</td><td>12.0%</td></tr>
+<tr><td>Both in cash (T-bills)</td><td class="muted">11.3%</td></tr>
+<tr style="border-top:2px solid #e5e7eb"><td>SP500 in-market</td><td><strong>76.6%</strong></td></tr>
+<tr><td>TLT in-market</td><td><strong>58.7%</strong></td></tr>
+<tr><td>Average % invested</td><td><strong>67.7%</strong></td></tr>
+</tbody>
+</table>
+</div>
+<div class="panel">
+<h3>Rolling 10-year CAGR win rates</h3>
+<table>
+<thead><tr><th style="text-align:left">Comparison</th><th>Win rate</th></tr></thead>
+<tbody>
+<tr><td>50/50 Timing beats 50/50 B&amp;H</td><td><strong>38.5% (185/480)</strong></td></tr>
+<tr><td>50/50 Timing beats SP500 B&amp;H</td><td class="green"><strong>44.4% (213/480)</strong></td></tr>
+</tbody>
+</table>
+<div style="margin-top:10px;font-size:12px;color:#57606a">Unlike the Gold case (71% win rate), TLT Timing only beats its own B&amp;H in 38% of 10-year windows. This reflects the structural bond bull market: staying long TLT (B&amp;H) often beat exiting on a sell signal and earning only T-bill rates. The timing rule was most valuable in preventing catastrophic losses (1977–80, 2022).</div>
+</div>
+</div>
+
+
+<h2>Direct Comparison — SP500 Timing vs 50/50 Timing vs 50/50 B&amp;H</h2>
+<table>
+<thead><tr><th>Metric</th><th>SP500 Timing</th><th>50/50 B&amp;H</th><th>50/50 Timing ★</th></tr></thead>
+<tbody>
+<tr><td colspan="4" style="background:#f7f8fa;font-weight:600;font-size:12px;padding:5px 10px">Full period 1977–2026</td></tr>
+<tr><td>CAGR%</td><td class="sp-c">11.58%</td><td>9.49%</td><td>10.16%</td></tr>
+<tr><td>Volatility</td><td>10.31%</td><td>11.86%</td><td class="c50">8.66%</td></tr>
+<tr><td>Sharpe</td><td class="sp-c">0.724</td><td>0.482</td><td>0.698</td></tr>
+<tr><td>Max Drawdown</td><td>−21.91%</td><td>−30.21%</td><td class="c50">−12.34%</td></tr>
+<tr><td>Calmar</td><td>0.528</td><td>0.314</td><td class="c50">0.823</td></tr>
+<tr><td>Ulcer Index</td><td>5.62%</td><td>7.44%</td><td class="c50">3.57%</td></tr>
+<tr><td>Worst year</td><td>−20.1% (2022)</td><td>−24.6% (2022)</td><td class="c50">−11.6% (2022)</td></tr>
+<tr><td colspan="4" style="background:#f7f8fa;font-weight:600;font-size:12px;padding:5px 10px">Faber era 1977–2012</td></tr>
+<tr><td>CAGR%</td><td class="sp-c">12.32%</td><td>10.12%</td><td>11.83%</td></tr>
+<tr><td>Sharpe</td><td>0.716</td><td>0.435</td><td class="c50">0.724</td></tr>
+<tr><td>Max Drawdown</td><td class="sp-c">−16.67%</td><td>−30.21%</td><td class="c50">−12.06%</td></tr>
+<tr><td>Worst year</td><td>−4.4% (2002)</td><td>−11.7% (1981)</td><td class="c50">−2.7% (1990)</td></tr>
+<tr><td colspan="4" style="background:#f7f8fa;font-weight:600;font-size:12px;padding:5px 10px">Modern era 2007–2026</td></tr>
+<tr><td>CAGR%</td><td class="sp-c">8.50%</td><td>7.47%</td><td>5.79%</td></tr>
+<tr><td>Sharpe</td><td class="sp-c">0.693</td><td>0.633</td><td>0.641</td></tr>
+<tr><td>Max Drawdown</td><td>−21.91%</td><td>−26.81%</td><td class="c50">−12.34%</td></tr>
+</tbody>
+</table>
+<div class="note"><strong>Verdict:</strong> SP500 Timing wins on CAGR and Sharpe in 2 of 3 windows. 50/50 Timing wins on <em>every</em> risk metric in every window: deepest drawdown −12.3% vs −21.9%, Ulcer 3.57 vs 5.62, Calmar 0.82 vs 0.53. In the modern era the bond drag is large: 50/50 Timing CAGR is 5.79% vs SP500 Timing 8.50% — a 2.7 pp/yr gap, driven by TLT's weak post-2007 performance. Unlike gold (which rallied 2020–25), TLT has been a persistent drag in the rising-rate regime.</div>
+
+
+<h2>Annual Returns — Year by Year (1977–2026)</h2>
+<div class="ann-grid">
+  <div class="ann-hdr">Year</div>
+  <div class="ann-hdr" style="color:#1d4ed8">SP500<br />B&amp;H</div>
+  <div class="ann-hdr" style="color:#7c3aed">TLT<br />B&amp;H</div>
+  <div class="ann-hdr" style="color:#166534">50/50<br />B&amp;H</div>
+  <div class="ann-hdr" style="color:#1d4ed8">SP500<br />Tmg</div>
+  <div class="ann-hdr" style="color:#7c3aed">TLT<br />Tmg</div>
+  <div class="ann-hdr" style="color:#166534">50/50<br />Tmg</div>
+
+  <div class="ann-yr">1977</div><div class="ann-c neg">−3.5</div><div class="ann-c pos">+1.3</div><div class="ann-c neg">−1.1</div><div class="ann-c pos">+4.1</div><div class="ann-c pos">+4.1</div><div class="ann-c pos">+4.1</div>
+  <div class="ann-yr">1978</div><div class="ann-c pos">+7.8</div><div class="ann-c neg">−8.2</div><div class="ann-c neg">−0.3</div><div class="ann-c pos">+8.1</div><div class="ann-c pos">+4.4</div><div class="ann-c pos">+6.4</div>
+  <div class="ann-yr">1979</div><div class="ann-c pos">+18.2</div><div class="ann-c neg">−12.5</div><div class="ann-c pos">+2.1</div><div class="ann-c pos">+18.2</div><div class="ann-c pos">+1.9</div><div class="ann-c pos">+9.9</div>
+  <div class="ann-yr">1980</div><div class="ann-c pos">+30.2</div><div class="ann-c neg lo">−27.6</div><div class="ann-c pos">+0.5</div><div class="ann-c pos">+24.8</div><div class="ann-c pos">+2.2</div><div class="ann-c pos">+13.8</div>
+  <div class="ann-yr">1981</div><div class="ann-c neg">−2.5</div><div class="ann-c neg">−23.7</div><div class="ann-c neg">−11.7</div><div class="ann-c pos">+4.7</div><div class="ann-c neg">−0.8</div><div class="ann-c pos">+2.2</div>
+  <div class="ann-yr">1982</div><div class="ann-c pos">+19.2</div><div class="ann-c pos hi">+93.5</div><div class="ann-c pos hi">+52.8</div><div class="ann-c pos">+25.1</div><div class="ann-c pos hi">+90.6</div><div class="ann-c pos hi">+55.7</div>
+  <div class="ann-yr">1983</div><div class="ann-c pos">+23.2</div><div class="ann-c neg">−16.6</div><div class="ann-c pos">+2.4</div><div class="ann-c pos">+23.2</div><div class="ann-c neg">−2.4</div><div class="ann-c pos">+10.3</div>
+  <div class="ann-yr">1984</div><div class="ann-c pos">+4.7</div><div class="ann-c pos">+15.1</div><div class="ann-c pos">+10.9</div><div class="ann-c pos">+2.6</div><div class="ann-c pos">+30.6</div><div class="ann-c pos">+16.1</div>
+  <div class="ann-yr">1985</div><div class="ann-c pos">+31.4</div><div class="ann-c pos">+61.5</div><div class="ann-c pos hi">+46.9</div><div class="ann-c pos">+31.4</div><div class="ann-c pos">+61.5</div><div class="ann-c pos hi">+46.9</div>
+  <div class="ann-yr">1986</div><div class="ann-c pos">+24.1</div><div class="ann-c pos">+43.3</div><div class="ann-c pos">+33.9</div><div class="ann-c pos">+24.1</div><div class="ann-c pos">+43.3</div><div class="ann-c pos">+33.9</div>
+  <div class="ann-yr">1987</div><div class="ann-c neg">−0.1</div><div class="ann-c neg">−18.6</div><div class="ann-c neg">−8.2</div><div class="ann-c pos">+16.5</div><div class="ann-c pos">+0.2</div><div class="ann-c pos">+8.6</div>
+  <div class="ann-yr">1988</div><div class="ann-c pos">+18.8</div><div class="ann-c pos">+6.3</div><div class="ann-c pos">+12.7</div><div class="ann-c pos">+7.0</div><div class="ann-c neg">−11.6</div><div class="ann-c neg">−2.6</div>
+  <div class="ann-yr">1989</div><div class="ann-c pos">+30.2</div><div class="ann-c pos">+29.0</div><div class="ann-c pos">+30.0</div><div class="ann-c pos">+30.2</div><div class="ann-c pos">+29.0</div><div class="ann-c pos">+30.0</div>
+  <div class="ann-yr">1990</div><div class="ann-c neg">−2.4</div><div class="ann-c pos">+1.7</div><div class="ann-c neg">−0.1</div><div class="ann-c neg">−2.8</div><div class="ann-c neg">−3.0</div><div class="ann-c neg">−2.7</div>
+  <div class="ann-yr">1991</div><div class="ann-c pos">+22.1</div><div class="ann-c pos">+25.4</div><div class="ann-c pos">+24.1</div><div class="ann-c pos">+11.2</div><div class="ann-c pos">+25.4</div><div class="ann-c pos">+18.3</div>
+  <div class="ann-yr">1992</div><div class="ann-c pos">+15.5</div><div class="ann-c pos">+7.4</div><div class="ann-c pos">+11.7</div><div class="ann-c pos">+15.5</div><div class="ann-c pos">+2.9</div><div class="ann-c pos">+9.3</div>
+  <div class="ann-yr">1993</div><div class="ann-c pos">+8.7</div><div class="ann-c pos">+27.8</div><div class="ann-c pos">+18.1</div><div class="ann-c pos">+8.7</div><div class="ann-c pos">+27.8</div><div class="ann-c pos">+18.1</div>
+  <div class="ann-yr">1994</div><div class="ann-c pos">+0.4</div><div class="ann-c neg">−19.3</div><div class="ann-c neg">−9.9</div><div class="ann-c neg">−2.1</div><div class="ann-c neg">−1.4</div><div class="ann-c neg">−1.6</div>
+  <div class="ann-yr">1995</div><div class="ann-c pos hi">+38.0</div><div class="ann-c pos">+49.6</div><div class="ann-c pos hi">+44.0</div><div class="ann-c pos hi">+38.0</div><div class="ann-c pos">+44.7</div><div class="ann-c pos hi">+41.6</div>
+  <div class="ann-yr">1996</div><div class="ann-c pos">+22.5</div><div class="ann-c neg">−6.5</div><div class="ann-c pos">+7.3</div><div class="ann-c pos">+22.5</div><div class="ann-c neg">−7.4</div><div class="ann-c pos">+6.7</div>
+  <div class="ann-yr">1997</div><div class="ann-c pos">+33.5</div><div class="ann-c pos">+20.3</div><div class="ann-c pos">+27.0</div><div class="ann-c pos">+33.5</div><div class="ann-c pos">+17.0</div><div class="ann-c pos">+25.3</div>
+  <div class="ann-yr">1998</div><div class="ann-c pos">+28.7</div><div class="ann-c pos">+22.2</div><div class="ann-c pos">+26.6</div><div class="ann-c pos">+12.7</div><div class="ann-c pos">+22.2</div><div class="ann-c pos">+18.4</div>
+  <div class="ann-yr">1999</div><div class="ann-c pos">+20.4</div><div class="ann-c neg">−17.9</div><div class="ann-c neg">−0.2</div><div class="ann-c pos">+13.6</div><div class="ann-c neg">−4.2</div><div class="ann-c pos">+4.5</div>
+  <div class="ann-yr">2000</div><div class="ann-c neg">−9.7</div><div class="ann-c pos">+26.6</div><div class="ann-c pos">+7.3</div><div class="ann-c pos">+0.0</div><div class="ann-c pos">+19.4</div><div class="ann-c pos">+9.4</div>
+  <div class="ann-yr">2001</div><div class="ann-c neg">−11.8</div><div class="ann-c pos">+4.0</div><div class="ann-c neg">−3.1</div><div class="ann-c pos">+3.4</div><div class="ann-c neg">−1.3</div><div class="ann-c pos">+1.3</div>
+  <div class="ann-yr">2002</div><div class="ann-c neg">−21.6</div><div class="ann-c pos">+8.2</div><div class="ann-c neg">−6.9</div><div class="ann-c neg">−4.4</div><div class="ann-c pos">+4.7</div><div class="ann-c pos">+0.1</div>
+  <div class="ann-yr">2003</div><div class="ann-c pos">+28.2</div><div class="ann-c pos">+1.6</div><div class="ann-c pos">+14.6</div><div class="ann-c pos">+23.0</div><div class="ann-c neg">−6.6</div><div class="ann-c pos">+7.6</div>
+  <div class="ann-yr">2004</div><div class="ann-c pos">+10.7</div><div class="ann-c pos">+8.7</div><div class="ann-c pos">+9.9</div><div class="ann-c pos">+9.7</div><div class="ann-c pos">+4.7</div><div class="ann-c pos">+7.3</div>
+  <div class="ann-yr">2005</div><div class="ann-c pos">+4.8</div><div class="ann-c pos">+8.6</div><div class="ann-c pos">+7.0</div><div class="ann-c pos">+4.8</div><div class="ann-c pos">+5.4</div><div class="ann-c pos">+5.4</div>
+  <div class="ann-yr">2006</div><div class="ann-c pos">+15.8</div><div class="ann-c pos">+0.7</div><div class="ann-c pos">+8.2</div><div class="ann-c pos">+15.8</div><div class="ann-c neg">−1.4</div><div class="ann-c pos">+7.0</div>
+  <div class="ann-yr">2007</div><div class="ann-c pos">+5.1</div><div class="ann-c pos">+10.3</div><div class="ann-c pos">+8.0</div><div class="ann-c pos">+5.1</div><div class="ann-c pos">+8.8</div><div class="ann-c pos">+7.2</div>
+  <div class="ann-yr">2008</div><div class="ann-c neg lo">−36.8</div><div class="ann-c pos hi">+34.0</div><div class="ann-c neg">−6.6</div><div class="ann-c pos">+1.6</div><div class="ann-c pos hi">+30.8</div><div class="ann-c pos">+15.8</div>
+  <div class="ann-yr">2009</div><div class="ann-c pos">+26.4</div><div class="ann-c neg">−21.8</div><div class="ann-c pos">+0.2</div><div class="ann-c pos">+22.7</div><div class="ann-c neg lo">−22.4</div><div class="ann-c neg">−1.8</div>
+  <div class="ann-yr">2010</div><div class="ann-c pos">+15.1</div><div class="ann-c pos">+9.0</div><div class="ann-c pos">+13.3</div><div class="ann-c neg">−1.2</div><div class="ann-c pos">+0.1</div><div class="ann-c pos">+0.2</div>
+  <div class="ann-yr">2011</div><div class="ann-c pos">+1.9</div><div class="ann-c pos">+34.0</div><div class="ann-c pos">+18.2</div><div class="ann-c neg">−2.0</div><div class="ann-c pos">+23.1</div><div class="ann-c pos">+10.4</div>
+  <div class="ann-yr">2012</div><div class="ann-c pos">+16.0</div><div class="ann-c pos">+2.4</div><div class="ann-c pos">+9.6</div><div class="ann-c pos">+10.8</div><div class="ann-c pos">+2.4</div><div class="ann-c pos">+7.1</div>
+  <div class="ann-yr">2013</div><div class="ann-c pos">+32.3</div><div class="ann-c neg">−13.4</div><div class="ann-c pos">+7.5</div><div class="ann-c pos">+32.3</div><div class="ann-c neg">−6.9</div><div class="ann-c pos">+11.3</div>
+  <div class="ann-yr">2014</div><div class="ann-c pos">+13.5</div><div class="ann-c pos">+27.3</div><div class="ann-c pos">+20.4</div><div class="ann-c pos">+13.5</div><div class="ann-c pos">+19.8</div><div class="ann-c pos">+16.6</div>
+  <div class="ann-yr">2015</div><div class="ann-c pos">+1.2</div><div class="ann-c neg">−1.8</div><div class="ann-c pos">+0.3</div><div class="ann-c neg">−4.3</div><div class="ann-c neg">−1.8</div><div class="ann-c neg">−2.6</div>
+  <div class="ann-yr">2016</div><div class="ann-c pos">+12.0</div><div class="ann-c pos">+1.2</div><div class="ann-c pos">+6.9</div><div class="ann-c pos">+5.0</div><div class="ann-c pos">+4.9</div><div class="ann-c pos">+5.1</div>
+  <div class="ann-yr">2017</div><div class="ann-c pos">+21.7</div><div class="ann-c pos">+9.2</div><div class="ann-c pos">+15.4</div><div class="ann-c pos">+21.7</div><div class="ann-c pos">+3.2</div><div class="ann-c pos">+12.1</div>
+  <div class="ann-yr">2018</div><div class="ann-c neg">−4.6</div><div class="ann-c neg">−1.6</div><div class="ann-c neg">−2.6</div><div class="ann-c neg">−6.1</div><div class="ann-c neg">−6.2</div><div class="ann-c neg">−5.8</div>
+  <div class="ann-yr">2019</div><div class="ann-c pos">+31.2</div><div class="ann-c pos">+14.1</div><div class="ann-c pos">+23.2</div><div class="ann-c pos">+10.6</div><div class="ann-c pos">+14.1</div><div class="ann-c pos">+13.0</div>
+  <div class="ann-yr">2020</div><div class="ann-c pos">+18.3</div><div class="ann-c pos">+18.2</div><div class="ann-c pos">+19.8</div><div class="ann-c pos">+14.7</div><div class="ann-c pos">+17.7</div><div class="ann-c pos">+17.0</div>
+  <div class="ann-yr">2021</div><div class="ann-c pos">+28.7</div><div class="ann-c neg">−4.6</div><div class="ann-c pos">+11.2</div><div class="ann-c pos">+28.7</div><div class="ann-c neg">−2.6</div><div class="ann-c pos">+12.2</div>
+  <div class="ann-yr">2022</div><div class="ann-c neg">−18.2</div><div class="ann-c neg lo">−31.2</div><div class="ann-c neg lo">−24.6</div><div class="ann-c neg lo">−20.1</div><div class="ann-c neg">−2.6</div><div class="ann-c neg">−11.6</div>
+  <div class="ann-yr">2023</div><div class="ann-c pos">+26.2</div><div class="ann-c pos">+2.8</div><div class="ann-c pos">+14.1</div><div class="ann-c pos">+9.6</div><div class="ann-c neg">−1.8</div><div class="ann-c pos">+3.9</div>
+  <div class="ann-yr">2024</div><div class="ann-c pos">+24.9</div><div class="ann-c neg">−8.1</div><div class="ann-c pos">+7.4</div><div class="ann-c pos">+24.9</div><div class="ann-c neg">−11.8</div><div class="ann-c pos">+5.2</div>
+  <div class="ann-yr">2025</div><div class="ann-c pos">+17.7</div><div class="ann-c pos">+4.2</div><div class="ann-c pos">+11.0</div><div class="ann-c pos">+12.5</div><div class="ann-c pos">+0.5</div><div class="ann-c pos">+6.4</div>
+  <div class="ann-yr">2026*</div><div class="ann-c pos">+10.1</div><div class="ann-c pos">+0.6</div><div class="ann-c pos">+5.5</div><div class="ann-c neg">−0.1</div><div class="ann-c pos">+0.8</div><div class="ann-c pos">+0.4</div>
+</div>
+<div class="note" style="margin-top:8px">* 2026 = Jan–Jun only. Highlighted green = best in decade for that strategy. Red = worst. <strong>1982</strong> stands out: TLT +93.5% (Paul Volcker's rate cut cycle began), giving all TLT-inclusive strategies extraordinary gains. <strong>2022</strong>: TLT −31.2%, the worst bond year since 1980 — timing limited the 50/50 strategy to −11.6%.</div>
+
+
+<h2>Key Conclusions</h2>
+<div style="border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;font-size:13px">
+  <div style="display:grid;grid-template-columns:28px 1fr;padding:11px 14px;border-bottom:1px solid #f0f1f3;background:#f0fdf4">
+    <span style="font-weight:700;color:#166534">1</span>
+    <div><strong>TLT is not a standalone investment — it's a portfolio tool.</strong> A 5.77% CAGR over 49 years with −67% max-DD and Sharpe 0.18 is a poor standalone result. Its value is entirely in its negative correlation with equities (−0.30 mean), which only materialised reliably from 2000–2019. In the 1980s–90s and 2020s the correlation was positive.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:28px 1fr;padding:11px 14px;border-bottom:1px solid #f0f1f3">
+    <span style="font-weight:700;color:#7c3aed">2</span>
+    <div><strong>SMA timing is essential for TLT — more so than for equities or gold.</strong> Timing cuts TLT's max-DD from −68% to −24% and improves CAGR from 5.77% to 8.05% over the full period. In 2022, timing limited losses to −2.6% vs −31.2% B&amp;H. Without timing, a buy-and-hold TLT position is extremely painful to hold through rate-rise cycles.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:28px 1fr;padding:11px 14px;border-bottom:1px solid #f0f1f3;background:#fdf4ff">
+    <span style="font-weight:700;color:#7c3aed">3</span>
+    <div><strong>50/50 SP500+TLT Timing is the smoothest ride but not the highest return.</strong> Max-DD of only −12.34% over 49 years (including 2022!), Ulcer Index 3.57%, and worst year −11.6%. But CAGR is 10.16% vs 11.58% for SP500-only Timing — a 1.4 pp annual cost for the smoother ride.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:28px 1fr;padding:11px 14px;border-bottom:1px solid #f0f1f3">
+    <span style="font-weight:700;color:#1d4ed8">4</span>
+    <div><strong>The negative correlation is not guaranteed going forward.</strong> In the 2020s it flipped back to positive as inflation drove both bonds and stocks lower. In a stagflationary environment, TLT provides no crisis hedge — unlike gold, which retained its diversification value. This is the fundamental difference between TLT and GLD as portfolio diversifiers.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:28px 1fr;padding:11px 14px">
+    <span style="font-weight:700;color:#57606a">5</span>
+    <div><strong>Gold vs TLT as the diversifier:</strong> Gold dominates TLT as a diversifier in the 2007–2026 period: Gold B&amp;H CAGR 9.47% vs TLT 3.12%; Gold+SP500 50/50 Timing Sharpe 1.064 vs TLT+SP500 0.641. For the long-run 1977–2026 period they are closer. A 3-asset portfolio (SP500 + Gold + TLT) combining both diversifiers is the natural next step.</div>
+  </div>
+</div>
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

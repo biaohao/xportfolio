@@ -1,0 +1,78 @@
+# ============================================================
+# Tactical Asset Allocation — Configuration
+# ============================================================
+# All scripts read this file.  To add or swap asset classes,
+# edit the `assets` dict below; no code changes are needed.
+# ============================================================
+
+# ----------------------------------------------------------
+# Asset universe
+# ----------------------------------------------------------
+assets:
+  SPY: "US Large Cap (S&P 500)"
+  EFA: "Foreign Developed (MSCI EAFE)"
+  IEF: "US 10-Year Bonds"
+  GSG: "Commodities (GSCI)"
+  VNQ: "US REITs (NAREIT)"
+  GLD: "Gold (SPDR)"
+
+# T-bill proxy used as the cash return when a signal is 0
+cash_proxy: "BIL"
+
+# ----------------------------------------------------------
+# Data settings
+# ----------------------------------------------------------
+data:
+  # ETF history fetch window (yfinance / Sub-Task 2a)
+  # The effective common start for all 5 assets + BIL is ~2007-07
+  etf_start_date: "1973-01-01"   # pull as far back as each ETF allows
+  end_date: "latest"             # "latest" → today's date at runtime
+
+  # Long-history fetch window (Shiller / FRED / Sub-Task 2b)
+  longhistory_start_date: "1871-01-01"
+
+  # ----------------------------------------------------------
+  # Backtest window — controls which slice of the downloaded
+  # data is actually used in report.py and plot.py.
+  # Set to "latest" / null to use all available data.
+  # ----------------------------------------------------------
+  backtest_start_date: "2007-05-30"  # e.g. "2007-05-30" or "latest" for full history
+  backtest_end_date: "2025-12-31"    # e.g. "2020-12-31" or "latest" for today
+
+# ----------------------------------------------------------
+# Strategy parameters
+# ----------------------------------------------------------
+strategy:
+  # SMA look-back periods by frequency.
+  # Monthly 10 ≈ Weekly 43 ≈ Daily 200 (standard equivalents).
+  # Adjust here if you want to test other parameter values.
+  sma_periods:
+    monthly: 10
+    weekly: 40
+    daily: 200
+
+  # Frequencies to run in the backtest and signal generator.
+  # Remove entries to skip a frequency.
+  rebalance_frequencies:
+    - monthly
+    - weekly
+    - daily
+
+  # Equal weight for all assets (1/N).
+  # Override with a dict of ticker→weight if unequal weighting is desired,
+  # e.g.:  weights: {SPY: 0.30, EFA: 0.20, IEF: 0.20, GSG: 0.15, VNQ: 0.15}
+  weights: equal
+
+# ----------------------------------------------------------
+# Reporting
+# ----------------------------------------------------------
+reporting:
+  # Risk-free rate used for Sharpe ratio calculation (annual, decimal).
+  # Set to 0.0 to use excess-return Sharpe; or a fixed rate like 0.04.
+  # "dynamic" uses the actual T-bill return series from the backtest.
+  risk_free_rate: "dynamic"
+
+  # Output paths (relative to project root)
+  results_dir: "results"
+  plots_dir: "plots"
+  data_dir: "data"

@@ -1,0 +1,7 @@
+label,frequency,start_date,end_date,years,cagr,volatility,sharpe,max_drawdown,calmar,pct_time_invested
+Buy & Hold,monthly,2007-05-31,2025-12-31,18.6,5.86,11.63,0.437,-39.62,0.148,
+Timing (GTAA),monthly,2007-05-31,2025-12-31,18.6,5.36,6.29,0.656,-9.75,0.55,66.1
+Buy & Hold,weekly,2007-06-01,2026-01-02,18.6,6.12,12.62,0.429,-42.56,0.144,
+Timing (GTAA),weekly,2007-06-01,2026-01-02,18.6,5.07,7.0,0.553,-11.08,0.457,66.0
+Buy & Hold,daily,2007-05-30,2025-12-31,18.6,6.33,13.58,0.423,-41.65,0.152,
+Timing (GTAA),daily,2007-05-30,2025-12-31,18.6,4.97,7.04,0.54,-14.38,0.346,66.2

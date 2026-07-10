@@ -1,0 +1,8 @@
+Asset,Full_period_corr_with_gold,Min_3yr_rolling_corr,Max_3yr_rolling_corr,Mean_3yr_rolling_corr,Observations
+SPY,0.029,-0.24,0.262,0.018,6488
+EFA,0.152,-0.143,0.426,0.153,6240
+IEF,0.21,-0.034,0.542,0.252,6015
+GSG,0.259,0.032,0.382,0.23,5017
+VNQ,0.059,-0.189,0.284,0.089,5473
+GLD,1.0,1.0,1.0,1.0,5437
+BIL,0.035,-0.127,0.106,0.003,4803

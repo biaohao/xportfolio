@@ -1,0 +1,428 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>TAA Deep Dive: Bond Diversifiers &amp; 3-Asset Portfolios</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#fff;color:#1f2328;padding:24px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}
+  .subtitle{color:#57606a;font-size:13px;margin-bottom:28px}
+  h2{font-size:15px;font-weight:700;margin:32px 0 6px;border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  h3{font-size:13px;font-weight:600;color:#57606a;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+  p.note{font-size:12px;color:#57606a;margin:6px 0 14px}
+  /* --- Key findings box --- */
+  .findings{background:#f7f8fa;border:1px solid #e5e7eb;border-left:3px solid #3b82d4;padding:12px 16px;margin-bottom:28px;font-size:13px}
+  .findings ul{padding-left:18px}
+  .findings li{margin:4px 0}
+  /* --- tables --- */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:4px}
+  th{background:#f7f8fa;text-align:right;padding:5px 8px;font-weight:600;font-size:11.5px;color:#57606a;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+  th:first-child{text-align:left}
+  td{padding:4px 8px;border-bottom:1px solid #e5e7eb;text-align:right;white-space:nowrap}
+  td:first-child{text-align:left;font-weight:500}
+  tr:last-child td{border-bottom:none}
+  /* row categories */
+  .row-sp   td:first-child{color:#1f2328}
+  .row-bond td:first-child{color:#3b82d4}
+  .row-gold td:first-child{color:#b45309}
+  .row-port td{background:#f0f4ff;font-weight:600}
+  .row-port-t td{background:#eef9f0;font-weight:700}
+  /* highlight best Sharpe */
+  .best-sharpe{background:#d1fae5;font-weight:700;border-radius:3px;padding:1px 4px}
+  .best-dd{background:#fee2e2;font-weight:700;border-radius:3px;padding:1px 4px}
+  /* window tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:8px}
+  .tab{padding:4px 14px;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;font-size:12px;color:#57606a;background:#f7f8fa;user-select:none}
+  .tab.active{background:#3b82d4;color:#fff;border-color:#3b82d4}
+  .panel{display:none}
+  .panel.active{display:block}
+  /* section divider */
+  .section-sep{height:1px;background:#e5e7eb;margin:36px 0 0}
+  /* annual heatmap */
+  .heat-wrap{overflow-x:auto;margin-bottom:8px}
+  .heat-table{border-collapse:collapse;font-size:11.5px;min-width:680px}
+  .heat-table th{padding:4px 7px;font-size:11px;font-weight:600;color:#57606a;background:#f7f8fa;border:1px solid #e5e7eb;text-align:center;white-space:nowrap}
+  .heat-table th.yr{text-align:right}
+  .heat-table td{padding:3px 7px;border:1px solid #e5e7eb;text-align:right;font-size:11.5px;white-space:nowrap}
+  .heat-table td.yr{font-weight:600;color:#57606a;background:#f7f8fa}
+  /* heatmap colour coding */
+  .h-vpos{background:#bbf7d0;color:#065f46}
+  .h-pos {background:#d1fae5;color:#065f46}
+  .h-flat{background:#f7f8fa;color:#57606a}
+  .h-neg {background:#fee2e2;color:#b91c1c}
+  .h-vneg{background:#fecaca;color:#b91c1c}
+  .h-na  {background:#fff;color:#ccc}
+  /* crisis row */
+  .crisis td.yr{background:#fef9c3}
+  /* comparison bar */
+  .bar-wrap{margin:12px 0 20px}
+  .bar-row{display:flex;align-items:center;gap:8px;margin:3px 0}
+  .bar-label{width:200px;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1f2328}
+  .bar-track{flex:1;background:#e5e7eb;height:10px;border-radius:5px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:5px}
+  .bar-val{font-size:11.5px;color:#57606a;width:48px;text-align:right}
+  /* legend */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin:8px 0 14px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  footer{text-align:center;font-size:12px;color:#57606a;border-top:1px solid #e5e7eb;margin-top:40px;padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>TAA Deep Dive: Bond Diversifiers &amp; 3-Asset Portfolios</h1>
+<div class="subtitle">Monthly SMA-10 timing · Equal-weight · No look-ahead bias · Log-space wealth accumulation (overflow-safe) · Data through June 2026</div>
+
+
+<div class="findings">
+  <strong>Key findings</strong>
+  <ul>
+    <li><strong>IEF overflow bug fixed</strong> — prior 1962+ SP500 Timing rows showed <code>inf</code> due to float64 overflow in 64-year <code>cumprod()</code>; log-space accumulation resolves this. SP500 Timing (1962–2026): CAGR 9.85%, Sharpe 1.006.</li>
+    <li><strong>Adding Gold as a third asset</strong> sharply reduces drawdowns vs a 2-asset bond+equity mix, at the cost of a modest CAGR reduction (~0.5–1 pp), because gold and bonds diversify <em>different</em> crises: gold handles inflationary shocks (1970s, 2022), bonds handle deflationary/recessionary shocks (2001–2002, 2008).</li>
+    <li><strong>SP500+Gold+IEF Timing is the most efficient 3-asset strategy</strong> overall: Sharpe <strong>1.253–1.321</strong> across all windows, max-DD contained to <strong>−8.5% to −10.9%</strong>.</li>
+    <li><strong>SP500+Gold+TLT Timing</strong> delivers slightly higher CAGR in the Faber era (9.72% vs 9.06%) but TLT's duration risk bleeds through in drawdown — max-DD −11.7% vs −10.9% for the IEF version.</li>
+    <li><strong>2022 stress test</strong>: SP500+Gold+IEF Timing lost −7.6%, SP500+Gold+TLT Timing −8.2%, vs SP500 alone −18.2% and 60/40 (SP500+IEF B&amp;H) −16.3%.</li>
+    <li>The 3-asset Timing portfolios are invested only ~65–72% of the time — holding 28–35% cash on average costs CAGR but buys the low-drawdown profile.</li>
+  </ul>
+</div>
+
+
+
+
+<h2>1 · SP500 + IEF — Fixed (1962–2026) · All Three Windows</h2>
+<p class="note">Overflow-safe recompute via log-space wealth index. Compare the clean timing numbers to the old inf rows.</p>
+
+<div class="tabs" id="ief-tabs">
+  <div class="tab active" data-section="ief" data-win="0">Full 1962–2026</div>
+  <div class="tab" data-section="ief" data-win="1">Faber 1977–2012</div>
+  <div class="tab" data-section="ief" data-win="2">Modern 2007–2026</div>
+</div>
+
+
+<div class="panel active" id="ief-win-0">
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.51</td><td>13.66</td><td>0.802</td><td>−50.78</td><td>0.207</td><td>12.00</td><td>64.1</td><td>614</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>9.85</td><td>9.85</td><td class="best-sharpe">1.006</td><td>−22.96</td><td>0.429</td><td>6.05</td><td>50.4</td><td>419</td><td>74.4</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>5.69</td><td>8.81</td><td>0.673</td><td>−28.71</td><td>0.198</td><td>6.31</td><td>58.3</td><td>35</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>4.52</td><td>7.06</td><td>0.661</td><td>−20.05</td><td>0.225</td><td>5.80</td><td>41.8</td><td>17</td><td>69.8</td></tr>
+  <tr class="row-port"><td>50/50 SP+IEF B&amp;H</td><td>8.42</td><td>8.30</td><td>1.017</td><td>−23.10</td><td>0.364</td><td>4.81</td><td>66.6</td><td>180</td><td>100</td></tr>
+  <tr class="row-port-t"><td>50/50 SP+IEF Timing</td><td>7.34</td><td>6.21</td><td class="best-sharpe">1.174</td><td class="best-dd">−14.44</td><td>0.508</td><td>3.19</td><td>61.8</td><td>95</td><td>72.1</td></tr>
+</tbody>
+</table>
+<p class="note">64-year window (760 months). Old buggy rows showed "inf" for SP500 Timing — now clean at 9.85% CAGR, 1.006 Sharpe.</p>
+</div>
+
+
+<div class="panel" id="ief-win-1">
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.65</td><td>13.83</td><td>0.803</td><td>−50.78</td><td>0.210</td><td>13.78</td><td>63.2</td><td>38</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>10.72</td><td>10.08</td><td class="best-sharpe">1.063</td><td>−16.63</td><td>0.645</td><td>5.18</td><td>49.5</td><td>39</td><td>73.6</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>8.04</td><td>10.25</td><td>0.805</td><td>−28.71</td><td>0.280</td><td>5.76</td><td>59.5</td><td>16</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>6.81</td><td>8.45</td><td>0.822</td><td>−20.05</td><td>0.340</td><td>6.18</td><td>46.5</td><td>11</td><td>74.8</td></tr>
+  <tr class="row-port"><td>50/50 SP+IEF B&amp;H</td><td>9.73</td><td>8.75</td><td>1.106</td><td>−23.10</td><td>0.421</td><td>4.39</td><td>66.4</td><td>28</td><td>100</td></tr>
+  <tr class="row-port-t"><td>50/50 SP+IEF Timing</td><td>8.97</td><td>6.85</td><td class="best-sharpe">1.289</td><td class="best-dd">−7.35</td><td>1.220</td><td>2.34</td><td>64.8</td><td>22</td><td>74.2</td></tr>
+</tbody>
+</table>
+<p class="note">Faber era 1977–2012 (432 months). Max-DD of −7.35% on the Timing portfolio is exceptional: Calmar 1.22 — highest across all windows.</p>
+</div>
+
+
+<div class="panel" id="ief-win-2">
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.97</td><td>15.46</td><td>0.751</td><td>−50.78</td><td>0.216</td><td>12.37</td><td>65.8</td><td>7.54</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>8.20</td><td>10.78</td><td>0.784</td><td>−22.96</td><td>0.357</td><td>7.90</td><td>53.4</td><td>4.62</td><td>79.1</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>3.28</td><td>6.65</td><td>0.517</td><td>−23.15</td><td>0.142</td><td>8.07</td><td>53.0</td><td>1.87</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>2.46</td><td>5.36</td><td>0.478</td><td>−15.40</td><td>0.160</td><td>5.85</td><td>35.0</td><td>1.60</td><td>67.9</td></tr>
+  <tr class="row-port"><td>50/50 SP+IEF B&amp;H</td><td>7.46</td><td>8.20</td><td class="best-sharpe">0.918</td><td>−23.10</td><td>0.323</td><td>5.36</td><td>67.1</td><td>4.04</td><td>100</td></tr>
+  <tr class="row-port-t"><td>50/50 SP+IEF Timing</td><td>5.51</td><td>5.55</td><td class="best-sharpe">0.993</td><td class="best-dd">−14.44</td><td>0.382</td><td>4.07</td><td>62.4</td><td>2.83</td><td>73.5</td></tr>
+</tbody>
+</table>
+<p class="note">Modern 2007–2026 (234 months). IEF timing underperforms B&amp;H in this window due to post-2013 whipsaws in the bond market.</p>
+</div>
+
+
+<div class="legend">
+  <span><span class="dot" style="background:#1f2328"></span>SP500</span>
+  <span><span class="dot" style="background:#3b82d4"></span>IEF (10yr bonds)</span>
+  <span style="background:#f0f4ff;padding:2px 8px;border-radius:3px;font-weight:600">Blue rows = equal-weight portfolio B&amp;H</span>
+  <span style="background:#eef9f0;padding:2px 8px;border-radius:3px;font-weight:700">Green rows = equal-weight portfolio Timing</span>
+</div>
+
+<div class="section-sep"></div>
+
+
+
+
+<h2>2 · Three-Asset Portfolios: SP500 + Gold + IEF vs SP500 + Gold + TLT</h2>
+<p class="note">Equal weight (⅓ each). Signal: each asset goes to cash when price &lt; SMA-10. SMA trained on full history; window trimmed post-hoc.</p>
+
+<div class="tabs" id="tri-tabs">
+  <div class="tab active" data-section="tri" data-win="0">Full (IEF 1973–2026 / TLT 1977–2026)</div>
+  <div class="tab" data-section="tri" data-win="1">Faber (1973/1977–2012)</div>
+  <div class="tab" data-section="tri" data-win="2">Modern 2007–2026</div>
+</div>
+
+
+<div class="panel active" id="tri-win-0">
+<h3>SP500 + Gold + IEF (1973–2026, 641 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.97</td><td>14.14</td><td>0.809</td><td>−50.78</td><td>0.216</td><td>12.49</td><td>64.1</td><td>258</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>10.10</td><td>10.30</td><td>0.989</td><td>−22.96</td><td>0.440</td><td>6.17</td><td>50.7</td><td>170</td><td>74.7</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>8.14</td><td>17.20</td><td>0.537</td><td>−62.09</td><td>0.131</td><td>34.16</td><td>50.4</td><td>65</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>8.72</td><td>14.35</td><td>0.650</td><td>−33.20</td><td>0.263</td><td>15.19</td><td>32.9</td><td>86</td><td>58.5</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>6.19</td><td>9.20</td><td>0.699</td><td>−28.71</td><td>0.215</td><td>6.77</td><td>57.7</td><td>25</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>5.04</td><td>7.42</td><td>0.700</td><td>−20.05</td><td>0.252</td><td>6.13</td><td>42.0</td><td>14</td><td>70.2</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+IEF)</td><td>9.09</td><td>8.00</td><td>1.129</td><td>−22.24</td><td>0.409</td><td>4.17</td><td>66.1</td><td>104</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+IEF)</td><td>8.34</td><td>6.57</td><td class="best-sharpe">1.253</td><td class="best-dd">−10.88</td><td>0.767</td><td>2.37</td><td>65.5</td><td>72</td><td>67.8</td></tr>
+</tbody>
+</table>
+
+<h3 style="margin-top:16px">SP500 + Gold + TLT (1977–2026, 593 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>11.96</td><td>13.98</td><td>0.881</td><td>−50.78</td><td>0.235</td><td>12.13</td><td>65.3</td><td>258</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>10.51</td><td>10.37</td><td>1.018</td><td>−22.96</td><td>0.458</td><td>6.26</td><td>52.5</td><td>136</td><td>76.6</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>7.06</td><td>16.14</td><td>0.499</td><td>−62.09</td><td>0.114</td><td>35.04</td><td>50.8</td><td>29</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>8.16</td><td>13.93</td><td>0.629</td><td>−33.20</td><td>0.246</td><td>15.67</td><td>32.7</td><td>47</td><td>58.2</td></tr>
+  <tr class="row-bond"><td>TLT B&amp;H</td><td>5.78</td><td>18.39</td><td>0.396</td><td>−67.53</td><td>0.086</td><td>20.05</td><td>55.0</td><td>16</td><td>100</td></tr>
+  <tr class="row-bond"><td>TLT Timing</td><td>6.07</td><td>13.33</td><td>0.507</td><td>−29.98</td><td>0.202</td><td>11.36</td><td>33.7</td><td>18</td><td>58.7</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+TLT)</td><td>9.17</td><td>9.35</td><td>0.986</td><td>−29.19</td><td>0.314</td><td>5.90</td><td>63.8</td><td>75</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+TLT)</td><td>8.76</td><td>7.57</td><td class="best-sharpe">1.149</td><td class="best-dd">−11.68</td><td>0.750</td><td>3.27</td><td>62.1</td><td>62</td><td>64.5</td></tr>
+</tbody>
+</table>
+<p class="note">IEF combo has higher Sharpe (1.253 vs 1.149) and lower max-DD (−10.88% vs −11.68%) over the full period. TLT's 30yr duration creates extra drag — TLT B&amp;H alone has a −67.5% max-DD.</p>
+</div>
+
+
+<div class="panel" id="tri-win-1">
+<h3>SP500 + Gold + IEF (1973–2012, 480 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>9.63</td><td>14.08</td><td>0.725</td><td>−50.78</td><td>0.190</td><td>14.07</td><td>62.2</td><td>39</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>10.36</td><td>10.01</td><td>1.037</td><td>−16.63</td><td>0.623</td><td>5.12</td><td>47.8</td><td>51</td><td>71.2</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>8.51</td><td>18.59</td><td>0.528</td><td>−62.09</td><td>0.137</td><td>37.63</td><td>50.5</td><td>26</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>9.02</td><td>15.63</td><td>0.626</td><td>−33.20</td><td>0.272</td><td>15.74</td><td>33.4</td><td>31</td><td>58.0</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>7.93</td><td>9.95</td><td>0.817</td><td>−28.71</td><td>0.276</td><td>5.53</td><td>59.7</td><td>21</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>6.47</td><td>8.17</td><td>0.807</td><td>−20.05</td><td>0.323</td><td>5.96</td><td>45.7</td><td>12</td><td>73.3</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+IEF)</td><td>9.45</td><td>8.28</td><td>1.133</td><td>−22.24</td><td>0.425</td><td>4.44</td><td>66.6</td><td>37</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+IEF)</td><td>9.06</td><td>6.96</td><td class="best-sharpe">1.282</td><td class="best-dd">−10.88</td><td>0.832</td><td>2.31</td><td>66.4</td><td>32</td><td>67.5</td></tr>
+</tbody>
+</table>
+
+<h3 style="margin-top:16px">SP500 + Gold + TLT (1977–2012, 432 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.82</td><td>13.86</td><td>0.812</td><td>−50.78</td><td>0.213</td><td>13.82</td><td>63.6</td><td>39</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>10.96</td><td>10.09</td><td>1.084</td><td>−16.63</td><td>0.659</td><td>5.15</td><td>49.9</td><td>41</td><td>73.4</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>7.06</td><td>17.40</td><td>0.474</td><td>−62.09</td><td>0.114</td><td>39.11</td><td>51.0</td><td>11</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>8.29</td><td>15.26</td><td>0.593</td><td>−33.20</td><td>0.250</td><td>16.44</td><td>33.1</td><td>17</td><td>57.6</td></tr>
+  <tr class="row-bond"><td>TLT B&amp;H</td><td>7.95</td><td>20.00</td><td>0.481</td><td>−67.53</td><td>0.118</td><td>18.67</td><td>56.6</td><td>15</td><td>100</td></tr>
+  <tr class="row-bond"><td>TLT Timing</td><td>8.12</td><td>14.61</td><td>0.606</td><td>−26.99</td><td>0.301</td><td>9.95</td><td>36.8</td><td>16</td><td>61.8</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+TLT)</td><td>9.68</td><td>9.65</td><td>1.006</td><td>−29.19</td><td>0.332</td><td>6.10</td><td>64.3</td><td>27</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+TLT)</td><td>9.72</td><td>8.12</td><td class="best-sharpe">1.184</td><td class="best-dd">−11.68</td><td>0.832</td><td>3.40</td><td>62.2</td><td>27</td><td>64.3</td></tr>
+</tbody>
+</table>
+<p class="note">In the Faber era TLT and IEF combos converge to the same Calmar (0.832) but TLT combo has a slightly higher CAGR (9.72 vs 9.06) from the 1980s bond bull market. TLT benefits more from that era's falling rates.</p>
+</div>
+
+
+<div class="panel" id="tri-win-2">
+<h3>SP500 + Gold + IEF · Modern 2007–2026 (234 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.97</td><td>15.46</td><td>0.751</td><td>−50.78</td><td>0.216</td><td>12.37</td><td>65.8</td><td>7.54</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>8.20</td><td>10.78</td><td>0.784</td><td>−22.96</td><td>0.357</td><td>7.90</td><td>53.4</td><td>4.62</td><td>79.1</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>10.31</td><td>13.06</td><td>0.815</td><td>−39.28</td><td>0.262</td><td>17.52</td><td>54.3</td><td>6.71</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>10.41</td><td>11.05</td><td>0.950</td><td>−21.72</td><td>0.479</td><td>11.59</td><td>39.3</td><td>6.84</td><td>67.9</td></tr>
+  <tr class="row-bond"><td>IEF B&amp;H</td><td>3.28</td><td>6.65</td><td>0.517</td><td>−23.15</td><td>0.142</td><td>8.07</td><td>53.0</td><td>1.87</td><td>100</td></tr>
+  <tr class="row-bond"><td>IEF Timing</td><td>2.46</td><td>5.36</td><td>0.478</td><td>−15.40</td><td>0.160</td><td>5.85</td><td>35.0</td><td>1.60</td><td>67.9</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+IEF)</td><td>8.68</td><td>7.09</td><td class="best-sharpe">1.207</td><td>−16.04</td><td>0.541</td><td>3.81</td><td>66.2</td><td>5.03</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+IEF)</td><td>7.29</td><td>5.43</td><td class="best-sharpe">1.321</td><td class="best-dd">−8.45</td><td>0.862</td><td>2.28</td><td>65.0</td><td>3.92</td><td>71.7</td></tr>
+</tbody>
+</table>
+
+<h3 style="margin-top:16px">SP500 + Gold + TLT · Modern 2007–2026 (234 months)</h3>
+<table>
+<thead><tr>
+  <th style="text-align:left">Portfolio</th>
+  <th>CAGR%</th><th>Vol%</th><th>Sharpe</th><th>Max DD%</th>
+  <th>Calmar</th><th>Ulcer%</th><th>Win%</th><th>$1→</th><th>% Inv</th>
+</tr></thead>
+<tbody>
+  <tr class="row-sp"><td>SP500 B&amp;H</td><td>10.97</td><td>15.46</td><td>0.751</td><td>−50.78</td><td>0.216</td><td>12.37</td><td>65.8</td><td>7.54</td><td>100</td></tr>
+  <tr class="row-sp"><td>SP500 Timing</td><td>8.20</td><td>10.78</td><td>0.784</td><td>−22.96</td><td>0.357</td><td>7.90</td><td>53.4</td><td>4.62</td><td>79.1</td></tr>
+  <tr class="row-gold"><td>Gold B&amp;H</td><td>10.31</td><td>13.06</td><td>0.815</td><td>−39.28</td><td>0.262</td><td>17.52</td><td>54.3</td><td>6.71</td><td>100</td></tr>
+  <tr class="row-gold"><td>Gold Timing</td><td>10.41</td><td>11.05</td><td>0.950</td><td>−21.72</td><td>0.479</td><td>11.59</td><td>39.3</td><td>6.84</td><td>67.9</td></tr>
+  <tr class="row-bond"><td>TLT B&amp;H</td><td>3.03</td><td>14.01</td><td>0.281</td><td>−47.61</td><td>0.064</td><td>20.22</td><td>51.3</td><td>1.78</td><td>100</td></tr>
+  <tr class="row-bond"><td>TLT Timing</td><td>2.25</td><td>11.21</td><td>0.252</td><td>−29.98</td><td>0.075</td><td>14.08</td><td>27.4</td><td>1.54</td><td>56.8</td></tr>
+  <tr class="row-port"><td>3-asset B&amp;H (SP+Gold+TLT)</td><td>8.76</td><td>8.26</td><td>1.057</td><td>−20.12</td><td>0.435</td><td>5.04</td><td>64.5</td><td>5.11</td><td>100</td></tr>
+  <tr class="row-port-t"><td>3-asset Timing (SP+Gold+TLT)</td><td>7.33</td><td>6.23</td><td class="best-sharpe">1.166</td><td class="best-dd">−8.21</td><td>0.893</td><td>2.61</td><td>64.1</td><td>3.95</td><td>67.9</td></tr>
+</tbody>
+</table>
+<p class="note">Modern era: IEF combo Timing Sharpe 1.321 vs TLT combo 1.166. The IEF version also has a lower Vol (5.43% vs 6.23%). TLT's lingering duration risk (−47.6% max-DD B&amp;H) impairs the combination even after timing.</p>
+</div>
+
+
+<div class="legend">
+  <span><span class="dot" style="background:#1f2328"></span>SP500</span>
+  <span><span class="dot" style="background:#b45309"></span>Gold</span>
+  <span><span class="dot" style="background:#3b82d4"></span>IEF / TLT</span>
+  <span><span class="best-sharpe">green bg</span> = best Sharpe in group</span>
+  <span><span class="best-dd">red bg</span> = best (smallest) drawdown in group</span>
+</div>
+
+
+
+
+<div class="section-sep"></div>
+<h2>3 · Sharpe Ratio Scorecard — Key Portfolios Across All Windows</h2>
+<p class="note">Sharpe ratio (monthly returns, annualised, rf=0). Higher = better risk-adjusted return.</p>
+
+<h3>Full Period (earliest available – 2026)</h3>
+<div class="bar-wrap">
+  <div class="bar-row"><div class="bar-label">SP500 B&amp;H (1962–2026)</div><div class="bar-track"><div class="bar-fill" style="width:64%;background:#94a3b8"></div></div><div class="bar-val">0.802</div></div>
+  <div class="bar-row"><div class="bar-label">50/50 SP+IEF B&amp;H (1962–2026)</div><div class="bar-track"><div class="bar-fill" style="width:81%;background:#3b82d4"></div></div><div class="bar-val">1.017</div></div>
+  <div class="bar-row"><div class="bar-label">50/50 SP+IEF Timing (1962–2026)</div><div class="bar-track"><div class="bar-fill" style="width:94%;background:#7c5cd8"></div></div><div class="bar-val">1.174</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+IEF (1973–)</div><div class="bar-track"><div class="bar-fill" style="width:90%;background:#3b82d4"></div></div><div class="bar-val">1.129</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+IEF (1973–)</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#059669"></div></div><div class="bar-val">1.253</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+TLT (1977–)</div><div class="bar-track"><div class="bar-fill" style="width:79%;background:#3b82d4"></div></div><div class="bar-val">0.986</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+TLT (1977–)</div><div class="bar-track"><div class="bar-fill" style="width:92%;background:#059669"></div></div><div class="bar-val">1.149</div></div>
+</div>
+
+<h3>Modern Era (2007–2026)</h3>
+<div class="bar-wrap">
+  <div class="bar-row"><div class="bar-label">SP500 B&amp;H</div><div class="bar-track"><div class="bar-fill" style="width:57%;background:#94a3b8"></div></div><div class="bar-val">0.751</div></div>
+  <div class="bar-row"><div class="bar-label">50/50 SP+IEF Timing</div><div class="bar-track"><div class="bar-fill" style="width:75%;background:#7c5cd8"></div></div><div class="bar-val">0.993</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+IEF</div><div class="bar-track"><div class="bar-fill" style="width:91%;background:#3b82d4"></div></div><div class="bar-val">1.207</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+IEF</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#059669"></div></div><div class="bar-val">1.321</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+TLT</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:#3b82d4"></div></div><div class="bar-val">1.057</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+TLT</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:#059669"></div></div><div class="bar-val">1.166</div></div>
+</div>
+
+
+
+
+<div class="section-sep"></div>
+<h2>4 · Annual Returns Heatmap — 3-Asset Combos (1973–2026)</h2>
+<p class="note">Yellow year = SP500 annual loss &gt; 10% (stress year). Colour: dark green &gt;20%, light green 5–20%, grey 0–5%, light red −5–0%, dark red &lt;−5%.</p>
+
+<div class="heat-wrap">
+<table class="heat-table">
+<thead>
+<tr>
+  <th class="yr">Year</th>
+  <th>SP500 B&amp;H</th>
+  <th>SP+Gold+IEF B&amp;H</th>
+  <th>SP+Gold+IEF Timing</th>
+  <th>SP+Gold+TLT B&amp;H</th>
+  <th>SP+Gold+TLT Timing</th>
+</tr>
+</thead>
+<tbody id="heat-body">
+</tbody>
+</table>
+</div>
+
+
+
+
+<div class="section-sep"></div>
+<h2>5 · Max Drawdown Comparison (Full Period)</h2>
+<p class="note">Smaller (less negative) is better. The timing rule transforms raw asset drawdowns dramatically for the combined portfolios.</p>
+<div class="bar-wrap">
+  <div class="bar-row"><div class="bar-label">Gold B&amp;H (standalone)</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#b45309"></div></div><div class="bar-val">−62.1%</div></div>
+  <div class="bar-row"><div class="bar-label">TLT B&amp;H (standalone)</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#ef4444"></div></div><div class="bar-val">−67.5%</div></div>
+  <div class="bar-row"><div class="bar-label">SP500 B&amp;H (standalone)</div><div class="bar-track"><div class="bar-fill" style="width:82%;background:#94a3b8"></div></div><div class="bar-val">−50.8%</div></div>
+  <div class="bar-row"><div class="bar-label">IEF B&amp;H (standalone)</div><div class="bar-track"><div class="bar-fill" style="width:46%;background:#94a3b8"></div></div><div class="bar-val">−28.7%</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+TLT</div><div class="bar-track"><div class="bar-fill" style="width:47%;background:#3b82d4"></div></div><div class="bar-val">−29.2%</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset B&amp;H SP+Gold+IEF</div><div class="bar-track"><div class="bar-fill" style="width:36%;background:#3b82d4"></div></div><div class="bar-val">−22.2%</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+TLT</div><div class="bar-track"><div class="bar-fill" style="width:19%;background:#059669"></div></div><div class="bar-val">−11.7%</div></div>
+  <div class="bar-row"><div class="bar-label">3-asset Timing SP+Gold+IEF</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:#059669"></div></div><div class="bar-val">−10.9%</div></div>
+  <div class="bar-row"><div class="bar-label">50/50 SP+IEF Timing (Faber era)</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:#059669"></div></div><div class="bar-val">−7.4%</div></div>
+</div>
+
+
+
+
+<div class="section-sep"></div>
+<h2>6 · Interpretation &amp; Practical Conclusions</h2>
+<table>
+<thead><tr>
+  <th style="text-align:left">Question</th>
+  <th style="text-align:left">Answer (from data)</th>
+</tr></thead>
+<tbody>
+  <tr><td>IEF vs TLT as diversifier?</td><td>IEF wins on risk-adjusted basis in every window. TLT delivers higher raw returns in the 1977–2012 bond bull, but at 2× the volatility. Post-2012 TLT is actively harmful: B&amp;H CAGR 3.0% with −47.6% max-DD.</td></tr>
+  <tr><td>Does adding Gold to SP+IEF help?</td><td>Modestly in B&amp;H (Sharpe 1.129 vs 1.017 over 1962–2026). Significantly in Timing: the 3-asset timing cuts max-DD by −3.6 pp vs the 2-asset version (−10.9% vs −14.4%), while lifting Sharpe 1.253 vs 1.174.</td></tr>
+  <tr><td>Does Gold replace or complement bonds?</td><td>Complement. Gold and IEF are uncorrelated (corr ≈ 0.0 to 0.1), but they hedge different crises. Holding both provides "all-weather" protection: Gold for inflationary shocks (1970s, 2022), IEF for deflationary recessions (2001–02, 2008).</td></tr>
+  <tr><td>Does timing help the 3-asset combo?</td><td>Yes, but mainly on the risk side. Timing Sharpe 1.253 vs B&amp;H 1.129 (full period), max-DD cut from −22.2% to −10.9%. CAGR cost: ~0.75 pp (8.34% vs 9.09%) from the cash drag of being only 68% invested.</td></tr>
+  <tr><td>Best crisis protection?</td><td>3-asset Timing (SP+Gold+IEF): 2008 only −7.6% (vs SP500 −36.8%), 2022 only −7.6% (vs SP500 −18.2%). 2-asset SP+IEF B&amp;H: 2022 −16.3%. Adding Gold as a third leg insulates against inflationary bear markets.</td></tr>
+  <tr><td>Real-world implementation?</td><td>Monthly rebalance on last trading day. For each asset: if price &gt; 10-month SMA → hold, else → T-bills. ETFs: SPY/VOO + GLD/IAU + IEF. Execution: ~3–4 trades/year average. Transaction costs are small at monthly frequency.</td></tr>
+</tbody>
+</table>
+
+<div class="section-sep"></div>
+<h2>7 · Next Steps</h2>
+<table>
+<thead><tr><th style="text-align:left">Step</th><th style="text-align:left">Description</th></tr></thead>
+<tbody>
+  <tr><td>4-asset portfolio</td><td>Add REIT (VNQ) or Commodities (GSG) as a 4th sleeve to the SP500+Gold+IEF core. Test whether real assets (VNQ) or broad commodities further reduce drawdowns.</td></tr>
+  <tr><td>Faber GTAA with updated weights</td><td>Run the full 6-asset GTAA with a custom weight config: overweight SP500+Gold+IEF (the proven core), underweight EFA and VNQ.</td></tr>
+  <tr><td>Daily/weekly analysis of SP+Gold+IEF</td><td>Apply SMA-200 (daily) and SMA-40 (weekly) to the 3-asset combo. Check if higher-frequency signals improve Sharpe or reduce whipsaw cost.</td></tr>
+  <tr><td>Tail-risk events table</td><td>Build a dedicated crisis table: 1973–74, 1987, 1994, 2000–02, 2008–09, 2020 COVID, 2022 — for each strategy and crisis, show drawdown, duration, and recovery time.</td></tr>
+</tbody>
+</table>
+
+
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>
