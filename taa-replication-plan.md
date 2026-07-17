@@ -63,7 +63,7 @@
 - Config must allow adding new tickers without code changes
 - `requirements.txt` must also include `pandas-datareader` and `requests` (for Shiller download)
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -94,7 +94,7 @@
 - ETF effective common start date for all 5 assets + cash proxy: ~July 2007
 - This module is the **only** data source for daily and weekly frequency backtests (long-history data in Sub-Task 2b is monthly only)
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -152,7 +152,7 @@
 - The `prices_monthly_spliced.csv` file is the input to the monthly-frequency backtest; `prices_daily.csv` (from Sub-Task 2a) is the input for daily and weekly backtests
 - `pandas-datareader` must be added to `requirements.txt`; `openpyxl` must be added for reading the Shiller Excel file
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -184,7 +184,7 @@
 - These equivalent periods should be configurable in `config.yaml` (not hardcoded)
 - Cash return proxy: use BIL/SHV period return when signal=0
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -220,7 +220,7 @@
 - These are benchmarks to validate the replication is correct
 - Annualization factor must match the frequency of the input returns series
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -248,7 +248,7 @@
 - Figures 7, 8, 13, 14 in the paper are the target outputs to match visually
 - Log scale equity curve is critical for long-horizon data (as used in the paper)
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -276,7 +276,7 @@
 - The most actionable output for the user's own portfolio monitoring
 - For monthly: signal is only meaningful at month-end; add a note showing days until next rebalance date
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 
@@ -304,7 +304,7 @@
 - Bond return construction from FRED yields (Sub-Task 2b) is an approximation; document clearly
 - The validation step is important for building confidence before applying to live portfolios
 
-**Status:** [ ] pending
+**Status:** [x] complete
 
 ---
 

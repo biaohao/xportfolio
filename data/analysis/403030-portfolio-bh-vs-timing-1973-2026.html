@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>40/30/30 Portfolio — Buy &amp; Hold vs Timing (SMA-10)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;
+        line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 48px}
+  .page{max-width:760px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+  h2{font-size:1.05rem;font-weight:600;margin:28px 0 8px;color:#1f2328;
+      border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  .subtitle{color:#57606a;font-size:.88rem;margin-bottom:20px}
+  .meta{font-size:.82rem;color:#57606a;margin-bottom:16px}
+  .period-block{margin-bottom:24px}
+  .period-label{font-size:.9rem;font-weight:600;color:#1f2328;margin-bottom:3px}
+  .period-sub{font-size:.8rem;color:#57606a;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 8px;text-align:left;
+      font-weight:600;color:#57606a;white-space:nowrap}
+  td{border:1px solid #e5e7eb;padding:5px 8px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .end-dollar{font-weight:600}
+  .bh-row{background:#fff}
+  .timing-row{background:#f0f6ff}
+  .neg{color:#cf222e;font-weight:600}
+  .warn{color:#9a6700}
+  th.hi{color:#3b82d4}
+  .chart-img{width:100%;height:auto;display:block;border:1px solid #e5e7eb;
+              border-radius:4px;margin-bottom:6px}
+  .chart-note{font-size:.78rem;color:#57606a;text-align:center;margin-bottom:16px}
+  .method-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+               padding:14px 16px;font-size:.82rem;color:#57606a;margin-top:6px}
+  .method-box p{margin-bottom:6px}
+  .method-box p:last-child{margin-bottom:0}
+  .method-box b{color:#1f2328}
+  footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;
+          text-align:center;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>40/30/30 Portfolio: Buy &amp; Hold vs. Timing (SMA-10)</h1>
+<p class="subtitle">40% S&amp;P 500 · 30% Long Bond (TLT) · 30% Gold (GLD) · Annual rebalancing</p>
+<p class="meta">Data: Shiller S&amp;P 500 TR (1871–), FRED DGS20 bond return (1962–), gold spot (1963–),
+all spliced with SPY/TLT/GLD ETFs at their launch dates. Cash (BIL) used only as exit destination for timed legs.
+SMA warm-up uses data from 1963; first signal Jan 1973 is based on the Dec 1972 price vs 10-month SMA — no look-ahead.</p>
+
+<h2>Performance Summary by Period</h2>
+<p class="meta">Timing rule: SPY, TLT, GLD each independently timed — invested when prior month-end price &gt; SMA-10,
+else T-bills. 1-month lag, no look-ahead. Portfolio rebalanced to 40/30/30 each January.</p>
+
+
+<div class="period-block">
+  <div class="period-label">1973–Jun 2026</div>
+  <div class="period-sub">Jan 1973 – Jun 2026 (53 years) &middot; 643 months</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th>
+      <th class="num">Volatility</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Avg DD</th>
+      <th class="num hi">Ulcer</th>
+      <th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+9.85%</td>
+  <td class="num">9.11%</td>
+  <td class="num">1.079</td>
+  <td class="num neg">-21.40%</td>
+  <td class="num">-2.59%</td>
+  <td class="num">4.66</td>
+  <td class="num end-dollar">$152.55</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+10.20%</td>
+  <td class="num">7.44%</td>
+  <td class="num">1.345</td>
+  <td class="num warn">-11.32%</td>
+  <td class="num">-1.50%</td>
+  <td class="num">2.72</td>
+  <td class="num end-dollar">$180.21</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="period-block">
+  <div class="period-label">2000–Jun 2026</div>
+  <div class="period-sub">Jan 2000 – Jun 2026 (26 years) &middot; 319 months</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th>
+      <th class="num">Volatility</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Avg DD</th>
+      <th class="num hi">Ulcer</th>
+      <th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+8.57%</td>
+  <td class="num">8.99%</td>
+  <td class="num">0.960</td>
+  <td class="num neg">-21.40%</td>
+  <td class="num">-2.78%</td>
+  <td class="num">4.76</td>
+  <td class="num end-dollar">$8.83</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+7.19%</td>
+  <td class="num">6.67%</td>
+  <td class="num">1.073</td>
+  <td class="num warn">-10.75%</td>
+  <td class="num">-1.87%</td>
+  <td class="num">3.11</td>
+  <td class="num end-dollar">$6.29</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Charts</h2>
+
+<h2>Figure 1 — 1973–Jun 2026</h2>
+<p class="chart-note">$1 invested &middot; log scale (top) &middot; drawdown + avg DD lines (bottom)
+&middot; B&amp;H $152.55 | Timing $180.21</p>
+<img class="chart-img" src="403030_equity_curve_1973-jun_2026.png"
+     alt="40/30/30 Portfolio B&amp;H vs Timing, 1973–Jun 2026">
+
+<h2>Figure 2 — 2000–Jun 2026</h2>
+<p class="chart-note">$1 invested &middot; log scale (top) &middot; drawdown + avg DD lines (bottom)
+&middot; B&amp;H $8.83 | Timing $6.29</p>
+<img class="chart-img" src="403030_equity_curve_2000-jun_2026.png"
+     alt="40/30/30 Portfolio B&amp;H vs Timing, 2000–Jun 2026">
+
+
+<h2>Methodology</h2>
+<div class="method-box">
+  <p><b>Portfolio construction:</b> 40% S&amp;P 500, 30% 20-year Treasury bond, 30% gold.
+     Rebalanced annually at the start of each January. Between rebalances weights drift with market returns.</p>
+  <p><b>Timing rule:</b> Each leg independently timed via its own 10-month SMA.
+     Price &gt; SMA &rarr; invested in that asset. Price &le; SMA &rarr; that leg moves to T-bills (BIL).
+     Signal at close of month t&minus;1, applied to return of month t (1-month lag, no look-ahead).</p>
+  <p><b>Warm-up &amp; base date:</b> SMA seeded using monthly prices from Jan 1963 onwards.
+     For the 1973 study, the first return (Jan 1973) uses the Dec 1972 → Jan 1973 price change,
+     so no return month is discarded. Signal for Jan 1973 is based on Dec 1972 price vs SMA.</p>
+  <p><b>Annual rebalance:</b> Notional leg values reset to 40/30/30 each January.
+     The timing signal within each leg is unaffected by rebalancing.</p>
+  <p><b>Bond return model:</b> FRED DGS20 yield-derived total return with convexity correction.
+     Spliced with TLT ETF from 2002.</p>
+  <p><b>Gold:</b> Kitco/GitHub spot price from 1963. Spliced with GLD ETF from Nov 2004.</p>
+  <p><b>No transaction costs, taxes or leverage.</b></p>
+</div>
+
+</div>
+<footer>Made with IBM Bob</footer>
+</body></html>

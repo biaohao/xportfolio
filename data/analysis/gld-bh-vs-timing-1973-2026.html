@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLD &mdash; Buy &amp; Hold vs Timing (SMA-10) | 1973&ndash;2026</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;
+        line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 48px}
+  .page{max-width:760px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+  h2{font-size:1.05rem;font-weight:600;margin:28px 0 8px;color:#1f2328;
+      border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  .subtitle{color:#57606a;font-size:.88rem;margin-bottom:20px}
+  .meta{font-size:.82rem;color:#57606a;margin-bottom:16px}
+  .period-block{margin-bottom:24px}
+  .period-label{font-size:.9rem;font-weight:600;color:#1f2328;margin-bottom:3px}
+  .period-sub{font-size:.8rem;color:#57606a;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 8px;text-align:left;
+      font-weight:600;color:#57606a;white-space:nowrap}
+  td{border:1px solid #e5e7eb;padding:5px 8px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .end-dollar{font-weight:600}
+  .bh-row{background:#fff}
+  .timing-row{background:#f0f6ff}
+  .neg{color:#cf222e;font-weight:600}
+  .warn{color:#9a6700}
+  th.hi{color:#3b82d4}
+  .chart-img{width:100%;height:auto;display:block;border:1px solid #e5e7eb;
+              border-radius:4px;margin-bottom:6px}
+  .chart-note{font-size:.78rem;color:#57606a;text-align:center;margin-bottom:16px}
+  .method-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+               padding:14px 16px;font-size:.82rem;color:#57606a;margin-top:6px}
+  .method-box p{margin-bottom:6px}
+  .method-box p:last-child{margin-bottom:0}
+  .method-box b{color:#1f2328}
+  .dl-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+           padding:10px 14px;font-size:.82rem;margin:8px 0 20px}
+  footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;
+          text-align:center;font-size:12px;color:#57606a}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>GLD: Buy &amp; Hold vs. Timing (SMA-10)</h1>
+<p class="subtitle">Gold — 53 years of monthly data, 1973–Jun 2026</p>
+<p class="meta">Data: GitHub datasets/gold-prices monthly spot price (1963–present) spliced with GLD ETF (Nov 2004–present).
+Gold prices were fixed under Bretton Woods until Aug 1971; free-float era used for backtest (1973+).
+Cash: FRED TB3MS T-bill (1934–present) spliced with BIL ETF from 2007.
+SMA warm-up uses 1963–1972 prices; first reported signal Jan 1973.</p>
+
+<div class="dl-box">
+  <b>Raw data export:</b> <code>gld_bh_timing_1973_2026.csv</code> &mdash; 642 monthly rows (Jan 1973&ndash;Jun 2026) with columns:
+  <code>price, sma10, signal, monthly_ret_bh, monthly_ret_timing, equity_bh, equity_timing,
+  drawdown_bh_pct, drawdown_timing_pct</code>
+</div>
+
+<h2>Performance Summary by Period</h2>
+<p class="meta">Rule: invested when prior month-end price &gt; SMA-10, else T-bills. 1-month lag, no look-ahead.</p>
+
+
+<div class="period-block">
+  <div class="period-label">1973–Jun 2026</div>
+  <div class="period-sub">Jan 1973 – Jun 2026 (53 years)</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th><th class="num">Volatility</th>
+      <th class="num">Sharpe</th><th class="num">Max DD</th>
+      <th class="num hi">Ulcer Index</th><th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+7.83%</td>
+  <td class="num">18.47%</td>
+  <td class="num">0.267</td>
+  <td class="num neg">-62.09%</td>
+  <td class="num">34.64</td>
+  <td class="num end-dollar">$56.05</td></tr>
+<tr class="timing-row"><td>Timing SMA-10 (60% invested)</td>
+  <td class="num">+10.40%</td>
+  <td class="num">15.77%</td>
+  <td class="num">0.435</td>
+  <td class="num neg">-38.88%</td>
+  <td class="num">14.78</td>
+  <td class="num end-dollar">$197.02</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div class="period-block">
+  <div class="period-label">2000–Jun 2026</div>
+  <div class="period-sub">Jan 2000 – Jun 2026 (26 years)</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th><th class="num">Volatility</th>
+      <th class="num">Sharpe</th><th class="num">Max DD</th>
+      <th class="num hi">Ulcer Index</th><th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+10.09%</td>
+  <td class="num">16.14%</td>
+  <td class="num">0.565</td>
+  <td class="num neg">-42.91%</td>
+  <td class="num">17.30</td>
+  <td class="num end-dollar">$12.68</td></tr>
+<tr class="timing-row"><td>Timing SMA-10 (71% invested)</td>
+  <td class="num">+7.80%</td>
+  <td class="num">13.40%</td>
+  <td class="num">0.492</td>
+  <td class="num neg">-38.88%</td>
+  <td class="num">19.45</td>
+  <td class="num end-dollar">$7.27</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<h2>Figure 1 &mdash; 1973&ndash;Jun 2026</h2>
+<p class="chart-note">$1 invested January 1973 &middot; log scale (top) &middot; drawdown (bottom) &middot; B&amp;H $56.05 | Timing $197.02</p>
+<img class="chart-img" src="gld_equity_curve_1973-jun_2026.png"
+     alt="GLD Buy &amp; Hold vs Timing SMA-10, 1973&ndash;Jun 2026 &mdash; equity curve and drawdown">
+
+<h2>Figure 2 &mdash; 2000&ndash;Jun 2026</h2>
+<p class="chart-note">$1 invested January 2000 &middot; log scale (top) &middot; drawdown (bottom) &middot; B&amp;H $12.68 | Timing $7.27</p>
+<img class="chart-img" src="gld_equity_curve_2000-jun_2026.png"
+     alt="GLD Buy &amp; Hold vs Timing SMA-10, 2000&ndash;Jun 2026 &mdash; equity curve and drawdown">
+
+
+<h2>Methodology</h2>
+<div class="method-box">
+  <p><b>Timing rule:</b> At each month-end compare price to 10-month SMA. Price &gt; SMA &rarr; invested in GLD.
+     Price &le; SMA &rarr; exit to T-bills. Signal at close of t&minus;1, applied to return of month t (1-month lag).</p>
+  <p><b>SMA warm-up:</b> Full 1963&ndash;1972 prices used to seed the SMA. First signal = Jan 1973. No look-ahead bias.</p>
+  <p><b>Base date:</b> For a period starting Jan YYYY, $1 is invested at Dec (YYYY&minus;1) close.
+     <code>pct_change()</code> is called on the full price series; the return series is then trimmed to the window start,
+     so the first month&rsquo;s return is never lost.</p>
+  <p><b>Gold price series:</b> Monthly spot price from GitHub datasets/gold-prices (original source: World Gold Council / LBMA).
+     Pre-1971 data reflects the Bretton Woods fixed peg ($35/oz); free-float begins Aug 1971.
+     Backtest uses 1973+ only. GLD ETF (adjusted close) takes over from Nov 2004 at the splice point.</p>
+  <p><b>Cash:</b> FRED TB3MS 3-month T-bill (1934&ndash;). Spliced with BIL ETF from 2007.</p>
+  <p><b>No costs, taxes or leverage.</b></p>
+</div>
+
+</div>
+<footer>Made with IBM Bob</footer>
+</body></html>

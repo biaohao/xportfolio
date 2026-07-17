@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEF vs TLT — Two-Period Deep Dive (1963 &amp; 2000)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#fff;color:#1f2328}
+  .page{max-width:820px;margin:0 auto;padding:32px 20px 56px}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}
+  h2{font-size:13px;font-weight:600;margin:32px 0 10px;text-transform:uppercase;letter-spacing:.04em;color:#57606a;border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  h3{font-size:12px;font-weight:700;margin:18px 0 6px;color:#1f2328;text-transform:uppercase;letter-spacing:.04em}
+  .subtitle{color:#57606a;font-size:13px;margin-bottom:20px}
+  /* ── period separator ── */
+  .period-header{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;
+    padding:10px 16px;margin:32px 0 18px;display:flex;align-items:baseline;gap:14px}
+  .period-header .plabel{font-size:15px;font-weight:700;color:#1f2328}
+  .period-header .pmeta{font-size:12px;color:#57606a}
+  /* ── badges ── */
+  .meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .badge{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:9px 13px}
+  .badge .lbl{font-size:11px;color:#57606a;text-transform:uppercase;letter-spacing:.05em}
+  .badge .val{font-size:15px;font-weight:700}
+  .badge .val.ief{color:#3b82d4}
+  .badge .val.tlt{color:#7c5cd8}
+  /* ── chart ── */
+  .chart-wrap{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;
+    padding:8px;margin-bottom:6px;overflow:hidden}
+  .chart-wrap img{width:100%;height:auto;display:block;border-radius:3px}
+  .chart-note{font-size:11px;color:#57606a;margin-bottom:18px;text-align:center}
+  /* ── tables ── */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
+  thead th{background:#f7f8fa;text-align:left;padding:7px 10px;font-weight:600;
+    border-bottom:2px solid #e5e7eb;white-space:nowrap}
+  thead th.ic{color:#3b82d4}
+  thead th.tc{color:#7c5cd8}
+  tbody tr{border-bottom:1px solid #e5e7eb}
+  tbody tr:last-child{border-bottom:none}
+  tbody td{padding:6px 10px}
+  tbody td:first-child{color:#57606a}
+  .better{font-weight:700;color:#1f2328}
+  /* ── heatmap ── */
+  .heatmap{display:grid;grid-template-columns:50px repeat(2,1fr);gap:2px;font-size:12px}
+  .heatmap-4{display:grid;grid-template-columns:50px repeat(4,1fr);gap:2px;font-size:11.5px}
+  .cell{padding:4px 6px;border-radius:3px;text-align:center;font-variant-numeric:tabular-nums}
+  .cell-lbl{background:#f7f8fa;border:1px solid #e5e7eb;color:#57606a;font-weight:600}
+  .hdr-ief{background:#dbeafe;color:#1e40af;font-weight:700}
+  .hdr-tlt{background:#ede9fe;color:#5b21b6;font-weight:700}
+  .ps{background:#d1fae5;color:#065f46}
+  .pm{background:#ecfdf5;color:#065f46}
+  .pw{background:#f0fdf4;color:#166534}
+  .nw{background:#fff7f7;color:#9b1c1c}
+  .nm{background:#fee2e2;color:#991b1b}
+  .ns{background:#fca5a5;color:#7f1d1d}
+  /* ── insight boxes ── */
+  .ibox{background:#f7f8fa;border-left:3px solid #3b82d4;border-radius:0 6px 6px 0;
+    padding:11px 14px;margin-bottom:10px;font-size:13px}
+  .ibox.b{border-left-color:#7c5cd8}
+  .ibox.n{border-left-color:#e5e7eb}
+  .ibox.w{border-left-color:#d97706}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .note{font-size:11px;color:#57606a;margin-top:4px;font-style:italic}
+  footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;
+    text-align:center;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>IEF vs TLT — US Treasury Deep Dive</h1>
+<p class="subtitle">Intermediate-Term (7–10yr) vs Long-Term (20+yr) · Two study periods:
+<strong>1963–Jun 2026</strong> (63 years, spliced proxy) and <strong>2000–Jun 2026</strong> (26 years, predominantly ETF era).
+Monthly total return, dividend-adjusted. Data: FRED DGS10/DGS20 yield-derived total-return index (1962–)
+spliced with IEF/TLT ETF (Jul 2002–present).</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PERIOD 1 — 1963–Jun 2026
+════════════════════════════════════════════════════════════════════════ -->
+<div class="period-header">
+  <span class="plabel">Period 1 — 1963–Jun 2026</span>
+  <span class="pmeta">Jan 1963 – Jun 2026 · 63 years · 762 monthly observations</span>
+</div>
+
+<div class="meta-row">
+  <div class="badge"><div class="lbl">IEF CAGR</div><div class="val ief">+6.01%</div></div>
+  <div class="badge"><div class="lbl">TLT CAGR</div><div class="val tlt">+5.92%</div></div>
+  <div class="badge"><div class="lbl">IEF Volatility</div><div class="val ief">7.48%</div></div>
+  <div class="badge"><div class="lbl">TLT Volatility</div><div class="val tlt">11.39%</div></div>
+  <div class="badge"><div class="lbl">IEF $1 →</div><div class="val ief">$40.47</div></div>
+  <div class="badge"><div class="lbl">TLT $1 →</div><div class="val tlt">$38.40</div></div>
+  <div class="badge"><div class="lbl">Correlation</div><div class="val">0.908</div></div>
+</div>
+
+<h2>Equity Curve &amp; Drawdown — 1963–Jun 2026</h2>
+<div class="chart-wrap">
+  <img src="ief_vs_tlt_1963-jun_2026.png"
+       alt="IEF vs TLT equity curve and drawdown 1963–Jun 2026">
+</div>
+<p class="chart-note">$1 invested January 1963 · log scale (top) · drawdown from peak with avg DD lines (bottom)</p>
+
+<h2>Performance Metrics — 1963–Jun 2026</h2>
+<table>
+  <thead>
+    <tr><th>Metric</th><th class="ic">IEF (7–10yr)</th><th class="tc">TLT (20+yr)</th><th>Edge</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Period</td><td colspan="2">Jan 1963 – Jun 2026 (63 years)</td><td>—</td></tr>
+    <tr><td>CAGR</td><td class="better">+6.01%</td><td>+5.92%</td><td style="color:#3b82d4">IEF +9 bp</td></tr>
+    <tr><td>Annualised Volatility</td><td class="better">7.48%</td><td>11.39%</td><td style="color:#3b82d4">IEF 1.5× lower</td></tr>
+    <tr><td>Sharpe (dynamic rf)</td><td class="better">0.244</td><td>0.185</td><td style="color:#3b82d4">IEF +32%</td></tr>
+    <tr><td>Max Drawdown</td><td class="better">−23.15%</td><td>−47.61%</td><td style="color:#3b82d4">IEF half the DD</td></tr>
+    <tr><td>Avg Drawdown</td><td class="better">−3.10%</td><td>−7.26%</td><td style="color:#3b82d4">IEF 2.3× shallower</td></tr>
+    <tr><td>Calmar Ratio</td><td class="better">0.260</td><td>0.124</td><td style="color:#3b82d4">IEF 2.1× better</td></tr>
+    <tr><td>Ulcer Index</td><td class="better">5.30</td><td>12.24</td><td style="color:#3b82d4">IEF less pain</td></tr>
+    <tr><td>Best Month</td><td>+12.19%</td><td class="better">+14.34%</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Worst Month</td><td class="better">−7.77%</td><td>−13.07%</td><td style="color:#3b82d4">IEF less severe</td></tr>
+    <tr><td>% Positive Months</td><td class="better">59.3%</td><td>56.3%</td><td style="color:#3b82d4">IEF</td></tr>
+    <tr><td>Avg Up Month</td><td>+1.80%</td><td class="better">+2.66%</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Avg Down Month</td><td class="better">−1.37%</td><td>−2.20%</td><td style="color:#3b82d4">IEF less damage</td></tr>
+    <tr><td>Best Year</td><td>+39.1% (1982)</td><td class="better">+45.7% (1982)</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Worst Year</td><td class="better">−15.2% (2022)</td><td>−31.2% (2022)</td><td style="color:#3b82d4">IEF half the loss</td></tr>
+    <tr><td>$1 Final Value</td><td class="better">$40.47</td><td>$38.40</td><td style="color:#3b82d4">IEF +$2.07</td></tr>
+  </tbody>
+</table>
+
+<h2>Annual Returns — 1963–Jun 2026</h2>
+<div class="heatmap">
+  <div class="cell cell-lbl" style="font-weight:700">Year</div>
+  <div class="cell hdr-ief">IEF</div><div class="cell hdr-tlt">TLT</div>
+  <div class="cell cell-lbl">1963</div><div class="cell pw">+1.6%</div><div class="cell pw">+0.4%</div>
+  <div class="cell cell-lbl">1964</div><div class="cell pw">+3.7%</div><div class="cell pw">+4.0%</div>
+  <div class="cell cell-lbl">1965</div><div class="cell pw">+0.8%</div><div class="cell pw">+0.2%</div>
+  <div class="cell cell-lbl">1966</div><div class="cell pm">+5.0%</div><div class="cell pw">+4.0%</div>
+  <div class="cell cell-lbl">1967</div><div class="cell nw">−3.1%</div><div class="cell nm">−7.0%</div>
+  <div class="cell cell-lbl">1968</div><div class="cell pw">+2.2%</div><div class="cell pw">+0.5%</div>
+  <div class="cell cell-lbl">1969</div><div class="cell nm">−5.4%</div><div class="cell nm">−4.3%</div>
+  <div class="cell cell-lbl">1970</div><div class="cell ps">+18.2%</div><div class="cell pm">+12.8%</div>
+  <div class="cell cell-lbl">1971</div><div class="cell pm">+11.0%</div><div class="cell pm">+11.8%</div>
+  <div class="cell cell-lbl">1972</div><div class="cell pw">+2.4%</div><div class="cell pm">+5.7%</div>
+  <div class="cell cell-lbl">1973</div><div class="cell pw">+3.3%</div><div class="cell nw">−7.4%</div>
+  <div class="cell cell-lbl">1974</div><div class="cell pw">+4.1%</div><div class="cell pw">+2.5%</div>
+  <div class="cell cell-lbl">1975</div><div class="cell pm">+5.6%</div><div class="cell pm">+7.2%</div>
+  <div class="cell cell-lbl">1976</div><div class="cell pm">+15.2%</div><div class="cell ps">+18.0%</div>
+  <div class="cell cell-lbl">1977</div><div class="cell pw">+0.6%</div><div class="cell nw">−0.6%</div>
+  <div class="cell cell-lbl">1978</div><div class="cell nw">−0.6%</div><div class="cell nw">−1.1%</div>
+  <div class="cell cell-lbl">1979</div><div class="cell pw">+2.0%</div><div class="cell nw">−1.0%</div>
+  <div class="cell cell-lbl">1980</div><div class="cell nw">−1.1%</div><div class="cell nm">−4.1%</div>
+  <div class="cell cell-lbl">1981</div><div class="cell pm">+5.4%</div><div class="cell nw">−0.1%</div>
+  <div class="cell cell-lbl">1982</div><div class="cell ps">+39.1%</div><div class="cell ps">+45.7%</div>
+  <div class="cell cell-lbl">1983</div><div class="cell pw">+2.4%</div><div class="cell pw">+0.6%</div>
+  <div class="cell cell-lbl">1984</div><div class="cell pm">+14.9%</div><div class="cell pm">+15.6%</div>
+  <div class="cell cell-lbl">1985</div><div class="cell ps">+29.6%</div><div class="cell ps">+33.3%</div>
+  <div class="cell cell-lbl">1986</div><div class="cell ps">+21.2%</div><div class="cell ps">+31.5%</div>
+  <div class="cell cell-lbl">1987</div><div class="cell nw">−2.5%</div><div class="cell nm">−7.3%</div>
+  <div class="cell cell-lbl">1988</div><div class="cell pm">+6.9%</div><div class="cell pm">+7.9%</div>
+  <div class="cell cell-lbl">1989</div><div class="cell ps">+17.7%</div><div class="cell ps">+20.5%</div>
+  <div class="cell cell-lbl">1990</div><div class="cell pm">+7.7%</div><div class="cell pm">+6.5%</div>
+  <div class="cell cell-lbl">1991</div><div class="cell ps">+18.8%</div><div class="cell ps">+20.0%</div>
+  <div class="cell cell-lbl">1992</div><div class="cell pm">+7.2%</div><div class="cell pm">+7.9%</div>
+  <div class="cell cell-lbl">1993</div><div class="cell pm">+12.9%</div><div class="cell pm">+16.4%</div>
+  <div class="cell cell-lbl">1994</div><div class="cell nm">−7.0%</div><div class="cell nm">−8.3%</div>
+  <div class="cell cell-lbl">1995</div><div class="cell ps">+25.3%</div><div class="cell ps">+32.4%</div>
+  <div class="cell cell-lbl">1996</div><div class="cell pw">+0.1%</div><div class="cell nw">−1.3%</div>
+  <div class="cell cell-lbl">1997</div><div class="cell pm">+11.9%</div><div class="cell pm">+15.5%</div>
+  <div class="cell cell-lbl">1998</div><div class="cell pm">+14.5%</div><div class="cell pm">+13.9%</div>
+  <div class="cell cell-lbl">1999</div><div class="cell nm">−7.7%</div><div class="cell nm">−9.8%</div>
+  <div class="cell cell-lbl">2000</div><div class="cell ps">+17.2%</div><div class="cell ps">+22.3%</div>
+  <div class="cell cell-lbl">2001</div><div class="cell pm">+5.4%</div><div class="cell pw">+3.8%</div>
+  <div class="cell cell-lbl">2002</div><div class="cell pm">+14.6%</div><div class="cell ps">+17.9%</div>
+  <div class="cell cell-lbl">2003</div><div class="cell pm">+5.3%</div><div class="cell pw">+1.6%</div>
+  <div class="cell cell-lbl">2004</div><div class="cell pw">+4.1%</div><div class="cell pm">+8.7%</div>
+  <div class="cell cell-lbl">2005</div><div class="cell pw">+2.6%</div><div class="cell pm">+8.6%</div>
+  <div class="cell cell-lbl">2006</div><div class="cell pw">+2.5%</div><div class="cell pw">+0.7%</div>
+  <div class="cell cell-lbl">2007</div><div class="cell pm">+10.4%</div><div class="cell pm">+10.3%</div>
+  <div class="cell cell-lbl">2008</div><div class="cell ps">+17.9%</div><div class="cell ps">+34.0%</div>
+  <div class="cell cell-lbl">2009</div><div class="cell nm">−6.6%</div><div class="cell ns">−21.8%</div>
+  <div class="cell cell-lbl">2010</div><div class="cell pm">+9.4%</div><div class="cell pm">+9.0%</div>
+  <div class="cell cell-lbl">2011</div><div class="cell pm">+15.6%</div><div class="cell ps">+34.0%</div>
+  <div class="cell cell-lbl">2012</div><div class="cell pw">+3.7%</div><div class="cell pw">+2.4%</div>
+  <div class="cell cell-lbl">2013</div><div class="cell nm">−6.1%</div><div class="cell nm">−13.4%</div>
+  <div class="cell cell-lbl">2014</div><div class="cell pm">+9.1%</div><div class="cell ps">+27.3%</div>
+  <div class="cell cell-lbl">2015</div><div class="cell pw">+1.5%</div><div class="cell nw">−1.8%</div>
+  <div class="cell cell-lbl">2016</div><div class="cell pw">+1.0%</div><div class="cell pw">+1.2%</div>
+  <div class="cell cell-lbl">2017</div><div class="cell pw">+2.6%</div><div class="cell pm">+9.2%</div>
+  <div class="cell cell-lbl">2018</div><div class="cell pw">+1.0%</div><div class="cell nw">−1.6%</div>
+  <div class="cell cell-lbl">2019</div><div class="cell pm">+8.0%</div><div class="cell pm">+14.1%</div>
+  <div class="cell cell-lbl">2020</div><div class="cell pm">+10.0%</div><div class="cell ps">+18.2%</div>
+  <div class="cell cell-lbl">2021</div><div class="cell nw">−3.3%</div><div class="cell nw">−4.6%</div>
+  <div class="cell cell-lbl">2022</div><div class="cell ns">−15.2%</div><div class="cell ns">−31.2%</div>
+  <div class="cell cell-lbl">2023</div><div class="cell pw">+3.6%</div><div class="cell pw">+2.8%</div>
+  <div class="cell cell-lbl">2024</div><div class="cell nw">−0.6%</div><div class="cell nm">−8.1%</div>
+  <div class="cell cell-lbl">2025</div><div class="cell pm">+8.0%</div><div class="cell pw">+4.2%</div>
+  <div class="cell cell-lbl">2026*</div><div class="cell nw">−0.1%</div><div class="cell pw">+1.0%</div>
+</div>
+<p class="note">* 2026 partial year (Jan–Jun only)</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PERIOD 2 — 2000–Jun 2026
+════════════════════════════════════════════════════════════════════════ -->
+<div class="period-header">
+  <span class="plabel">Period 2 — 2000–Jun 2026</span>
+  <span class="pmeta">Jan 2000 – Jun 2026 · 26 years · 318 monthly observations · predominantly real ETF data</span>
+</div>
+
+<div class="meta-row">
+  <div class="badge"><div class="lbl">IEF CAGR</div><div class="val ief">+4.34%</div></div>
+  <div class="badge"><div class="lbl">TLT CAGR</div><div class="val tlt">+4.54%</div></div>
+  <div class="badge"><div class="lbl">IEF Volatility</div><div class="val ief">6.70%</div></div>
+  <div class="badge"><div class="lbl">TLT Volatility</div><div class="val tlt">13.09%</div></div>
+  <div class="badge"><div class="lbl">IEF $1 →</div><div class="val ief">$3.07</div></div>
+  <div class="badge"><div class="lbl">TLT $1 →</div><div class="val tlt">$3.23</div></div>
+  <div class="badge"><div class="lbl">Correlation</div><div class="val">0.909</div></div>
+</div>
+
+<h2>Equity Curve &amp; Drawdown — 2000–Jun 2026</h2>
+<div class="chart-wrap">
+  <img src="ief_vs_tlt_2000-jun_2026.png"
+       alt="IEF vs TLT equity curve and drawdown 2000–Jun 2026">
+</div>
+<p class="chart-note">$1 invested January 2000 · log scale (top) · drawdown from peak with avg DD lines (bottom)</p>
+
+<h2>Performance Metrics — 2000–Jun 2026</h2>
+<table>
+  <thead>
+    <tr><th>Metric</th><th class="ic">IEF (7–10yr)</th><th class="tc">TLT (20+yr)</th><th>Edge</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Period</td><td colspan="2">Jan 2000 – Jun 2026 (26 years)</td><td>—</td></tr>
+    <tr><td>CAGR</td><td>+4.34%</td><td class="better">+4.54%</td><td style="color:#7c5cd8">TLT +20 bp</td></tr>
+    <tr><td>Annualised Volatility</td><td class="better">6.70%</td><td>13.09%</td><td style="color:#3b82d4">IEF 2× lower</td></tr>
+    <tr><td>Sharpe (dynamic rf)</td><td class="better">0.394</td><td>0.264</td><td style="color:#3b82d4">IEF +49%</td></tr>
+    <tr><td>Max Drawdown</td><td class="better">−23.15%</td><td>−47.61%</td><td style="color:#3b82d4">IEF half the DD</td></tr>
+    <tr><td>Avg Drawdown</td><td class="better">−4.38%</td><td>−11.61%</td><td style="color:#3b82d4">IEF 2.6× shallower</td></tr>
+    <tr><td>Calmar Ratio</td><td class="better">0.187</td><td>0.095</td><td style="color:#3b82d4">IEF 2× better</td></tr>
+    <tr><td>Ulcer Index</td><td class="better">7.01</td><td>17.48</td><td style="color:#3b82d4">IEF less pain</td></tr>
+    <tr><td>Best Month</td><td>+7.75%</td><td class="better">+14.34%</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Worst Month</td><td class="better">−5.02%</td><td>−13.07%</td><td style="color:#3b82d4">IEF less severe</td></tr>
+    <tr><td>% Positive Months</td><td class="better">56.3%</td><td>55.0%</td><td style="color:#3b82d4">IEF</td></tr>
+    <tr><td>Avg Up Month</td><td>+1.67%</td><td class="better">+3.03%</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Avg Down Month</td><td class="better">−1.31%</td><td>−2.73%</td><td style="color:#3b82d4">IEF less damage</td></tr>
+    <tr><td>Best Year</td><td>+17.9% (2008)</td><td class="better">+34.0% (2011)</td><td style="color:#7c5cd8">TLT</td></tr>
+    <tr><td>Worst Year</td><td class="better">−15.2% (2022)</td><td>−31.2% (2022)</td><td style="color:#3b82d4">IEF half the loss</td></tr>
+    <tr><td>$1 Final Value</td><td>$3.07</td><td class="better">$3.23</td><td style="color:#7c5cd8">TLT +$0.16</td></tr>
+  </tbody>
+</table>
+
+<h2>Annual Returns — 2000–Jun 2026</h2>
+<div class="heatmap">
+  <div class="cell cell-lbl" style="font-weight:700">Year</div>
+  <div class="cell hdr-ief">IEF</div><div class="cell hdr-tlt">TLT</div>
+  <div class="cell cell-lbl">2000</div><div class="cell ps">+17.2%</div><div class="cell ps">+22.3%</div>
+  <div class="cell cell-lbl">2001</div><div class="cell pm">+5.4%</div><div class="cell pw">+3.8%</div>
+  <div class="cell cell-lbl">2002</div><div class="cell pm">+14.6%</div><div class="cell ps">+17.9%</div>
+  <div class="cell cell-lbl">2003</div><div class="cell pm">+5.3%</div><div class="cell pw">+1.6%</div>
+  <div class="cell cell-lbl">2004</div><div class="cell pw">+4.1%</div><div class="cell pm">+8.7%</div>
+  <div class="cell cell-lbl">2005</div><div class="cell pw">+2.6%</div><div class="cell pm">+8.6%</div>
+  <div class="cell cell-lbl">2006</div><div class="cell pw">+2.5%</div><div class="cell pw">+0.7%</div>
+  <div class="cell cell-lbl">2007</div><div class="cell pm">+10.4%</div><div class="cell pm">+10.3%</div>
+  <div class="cell cell-lbl">2008</div><div class="cell ps">+17.9%</div><div class="cell ps">+34.0%</div>
+  <div class="cell cell-lbl">2009</div><div class="cell nm">−6.6%</div><div class="cell ns">−21.8%</div>
+  <div class="cell cell-lbl">2010</div><div class="cell pm">+9.4%</div><div class="cell pm">+9.0%</div>
+  <div class="cell cell-lbl">2011</div><div class="cell pm">+15.6%</div><div class="cell ps">+34.0%</div>
+  <div class="cell cell-lbl">2012</div><div class="cell pw">+3.7%</div><div class="cell pw">+2.4%</div>
+  <div class="cell cell-lbl">2013</div><div class="cell nm">−6.1%</div><div class="cell nm">−13.4%</div>
+  <div class="cell cell-lbl">2014</div><div class="cell pm">+9.1%</div><div class="cell ps">+27.3%</div>
+  <div class="cell cell-lbl">2015</div><div class="cell pw">+1.5%</div><div class="cell nw">−1.8%</div>
+  <div class="cell cell-lbl">2016</div><div class="cell pw">+1.0%</div><div class="cell pw">+1.2%</div>
+  <div class="cell cell-lbl">2017</div><div class="cell pw">+2.6%</div><div class="cell pm">+9.2%</div>
+  <div class="cell cell-lbl">2018</div><div class="cell pw">+1.0%</div><div class="cell nw">−1.6%</div>
+  <div class="cell cell-lbl">2019</div><div class="cell pm">+8.0%</div><div class="cell pm">+14.1%</div>
+  <div class="cell cell-lbl">2020</div><div class="cell pm">+10.0%</div><div class="cell ps">+18.2%</div>
+  <div class="cell cell-lbl">2021</div><div class="cell nw">−3.3%</div><div class="cell nw">−4.6%</div>
+  <div class="cell cell-lbl">2022</div><div class="cell ns">−15.2%</div><div class="cell ns">−31.2%</div>
+  <div class="cell cell-lbl">2023</div><div class="cell pw">+3.6%</div><div class="cell pw">+2.8%</div>
+  <div class="cell cell-lbl">2024</div><div class="cell nw">−0.6%</div><div class="cell nm">−8.1%</div>
+  <div class="cell cell-lbl">2025</div><div class="cell pm">+8.0%</div><div class="cell pw">+4.2%</div>
+  <div class="cell cell-lbl">2026*</div><div class="cell nw">−0.1%</div><div class="cell pw">+1.0%</div>
+</div>
+<p class="note">* 2026 partial year (Jan–Jun only)</p>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CROSS-PERIOD COMPARISON
+════════════════════════════════════════════════════════════════════════ -->
+<h2>Cross-Period Comparison</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th class="ic">IEF 1963–2026</th><th class="tc">TLT 1963–2026</th>
+      <th class="ic">IEF 2000–2026</th><th class="tc">TLT 2000–2026</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>CAGR</td><td class="better">+6.01%</td><td>+5.92%</td><td>+4.34%</td><td class="better">+4.54%</td></tr>
+    <tr><td>Volatility</td><td class="better">7.48%</td><td>11.39%</td><td class="better">6.70%</td><td>13.09%</td></tr>
+    <tr><td>Sharpe</td><td class="better">0.244</td><td>0.185</td><td class="better">0.394</td><td>0.264</td></tr>
+    <tr><td>Max Drawdown</td><td class="better">−23.15%</td><td>−47.61%</td><td class="better">−23.15%</td><td>−47.61%</td></tr>
+    <tr><td>Avg Drawdown</td><td class="better">−3.10%</td><td>−7.26%</td><td class="better">−4.38%</td><td>−11.61%</td></tr>
+    <tr><td>Calmar</td><td class="better">0.260</td><td>0.124</td><td class="better">0.187</td><td>0.095</td></tr>
+    <tr><td>Ulcer Index</td><td class="better">5.30</td><td>12.24</td><td class="better">7.01</td><td>17.48</td></tr>
+    <tr><td>$1 Final Value</td><td class="better">$40.47</td><td>$38.40</td><td>$3.07</td><td class="better">$3.23</td></tr>
+    <tr><td>Correlation</td><td colspan="2" style="text-align:center">0.908</td><td colspan="2" style="text-align:center">0.909</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RISK-RETURN ANALYSIS
+════════════════════════════════════════════════════════════════════════ -->
+<h2>Risk-Return Analysis</h2>
+<div class="g2">
+  <div class="ibox"><strong>IEF: Consistent Risk-Adjusted Leader</strong><br>
+  Wins on Sharpe, Calmar, and Ulcer Index in both periods. Over 63 years IEF also edges TLT on
+  terminal value ($40.47 vs $38.40) while running at half the volatility. The 2022 rate-hike cycle
+  (−15.2% vs −31.2%) is the clearest demonstration of IEF's structural advantage in adverse rate environments.</div>
+  <div class="ibox b"><strong>TLT: High-Beta Duration, Context-Dependent</strong><br>
+  Wins on terminal return in the 2000–2026 window ($3.23 vs $3.07) — but at 2× the vol, 2× the max DD,
+  and 2.6× the avg DD. Crisis years (2000, 2002, 2008, 2011, 2014, 2020) reward TLT with outsized gains;
+  rate-hiking years (2009, 2013, 2022) deliver proportionally larger losses.</div>
+</div>
+<div class="ibox n"><strong>Correlation stays near 0.91 in both periods.</strong>
+Both ETFs track the same Treasury curve and move directionally together ~91% of the time.
+TLT is effectively a ~2.3× duration-leveraged version of IEF: larger upside capture in rallies,
+proportionally larger drawdowns in sell-offs. The leverage ratio is consistent across both study windows.</div>
+
+<div class="ibox w"><strong>Avg Drawdown: the hidden risk measure.</strong>
+Max drawdown (IEF −23%, TLT −48%) captures only the worst single episode. Average drawdown
+tells you the typical lived experience: IEF sits on average only −3.1% below its prior peak over 63 years,
+vs TLT's −7.3%. In the 2000–2026 window both worsen (IEF −4.4%, TLT −11.6%) as the 2020–2024
+rate-hike drawdown drags both averages up — but TLT's worsening is more than 2.5× IEF's.</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     KEY RATE EPISODES
+════════════════════════════════════════════════════════════════════════ -->
+<h2>Key Rate Episodes</h2>
+<table>
+  <thead><tr><th>Episode</th><th class="ic">IEF</th><th class="tc">TLT</th><th>Takeaway</th></tr></thead>
+  <tbody>
+    <tr><td>1982 Rate Peak &amp; Bull Onset</td><td>+39.1%</td><td class="better">+45.7%</td><td>Long duration wins biggest when rates peak</td></tr>
+    <tr><td>1994 Taper Tantrum (early)</td><td class="better">−7.0%</td><td>−8.3%</td><td>IEF less exposed to Fed surprises</td></tr>
+    <tr><td>1999 Pre-2000 Rate Rise</td><td class="better">−7.7%</td><td>−9.8%</td><td>IEF cushions rate rises better</td></tr>
+    <tr><td>2000 Dot-com + Rate Cuts</td><td>+17.2%</td><td class="better">+22.3%</td><td>Long duration rewards in crises</td></tr>
+    <tr><td>2008 Financial Crisis</td><td>+17.9%</td><td class="better">+34.0%</td><td>Max-duration flight-to-safety surge</td></tr>
+    <tr><td>2009 Rate Backup</td><td class="better">−6.6%</td><td>−21.8%</td><td>TLT 3× more pain on reversal</td></tr>
+    <tr><td>2011 Euro Crisis + QE</td><td>+15.6%</td><td class="better">+34.0%</td><td>Flight-to-safety doubly rewards TLT</td></tr>
+    <tr><td>2013 Taper Tantrum</td><td class="better">−6.1%</td><td>−13.4%</td><td>TLT more exposed to surprises</td></tr>
+    <tr><td>2014 Bond Bull</td><td>+9.1%</td><td class="better">+27.3%</td><td>Falling rates → TLT 3× upside</td></tr>
+    <tr><td>2020 COVID + QE</td><td>+10.0%</td><td class="better">+18.2%</td><td>Fastest-ever Fed response</td></tr>
+    <tr><td>2022 Hiking Cycle (+425 bp)</td><td class="better">−15.2%</td><td>−31.2%</td><td>IEF loses half as much</td></tr>
+    <tr><td>2025 YTD (Jan–Jun)</td><td class="better">+8.0%</td><td>+4.2%</td><td>Mid-curve outperforms on rate plateau</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DURATION MECHANICS
+════════════════════════════════════════════════════════════════════════ -->
+<h2>Duration Mechanics</h2>
+<div class="g2">
+  <div class="ibox"><strong>IEF — ~7.5yr Modified Duration</strong><br>
+  100 bp parallel rate rise → approx. −7.5% price loss. Recoverable within 1–2 years of coupon income
+  (~4–5%), so a moderate rate rise need not produce a negative total return.</div>
+  <div class="ibox b"><strong>TLT — ~16–18yr Modified Duration</strong><br>
+  The same 100 bp rise wipes ~−17% from price. In 2022 the Fed hiked +425 bp in 12 months —
+  TLT's worst year on record (−31%), erasing over a decade of coupon income in a single year.</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PORTFOLIO USE CASES
+════════════════════════════════════════════════════════════════════════ -->
+<h2>Portfolio Use Cases</h2>
+<table>
+  <thead><tr><th>Use Case</th><th>Preferred</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr><td>TAA / Trend-Following (GTAA)</td><td style="color:#3b82d4"><strong>IEF</strong></td><td>Lower vol keeps SMA signals cleaner; smaller whipsaws</td></tr>
+    <tr><td>Recession hedge / flight-to-safety</td><td style="color:#7c5cd8"><strong>TLT</strong></td><td>Maximum duration = maximum rally when rates crash</td></tr>
+    <tr><td>60/40 bond sleeve</td><td style="color:#3b82d4"><strong>IEF</strong></td><td>Better risk-adjusted contribution; less drag in rate rises</td></tr>
+    <tr><td>Tactical duration bet</td><td style="color:#7c5cd8"><strong>TLT</strong></td><td>Higher beta gives more P&amp;L per 1 bp move</td></tr>
+    <tr><td>Low-risk income / retiree bond</td><td style="color:#3b82d4"><strong>IEF</strong></td><td>−23% max DD vs −48%; far more stomach-able</td></tr>
+    <tr><td>Inflation / stagflation environment</td><td colspan="2" style="color:#57606a">Both suffer — shorten duration to BIL/SHY instead</td></tr>
+  </tbody>
+</table>
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

@@ -10,8 +10,7 @@ PART 2: Three-asset portfolios
          Equal-weight rebalanced monthly; B&H and Timing (SMA-10) variants.
 
 Data:
-  data/processed/prices_monthly_spliced.csv  — SPY col (1871+), IEF col (1962+), BIL col (1934+)
-  data/processed/tlt_monthly_spliced.csv     — TLT col (1977+)
+  data/processed/prices_monthly_spliced.csv  — SPY col (1871+), IEF col (1962+), TLT col (1962+), BIL col (1934+)
   data/processed/gold_monthly.csv            — Gold spot prices (1973+)
 
 Outputs:
@@ -20,7 +19,6 @@ Outputs:
   results/triple_asset_annual.csv     — Part 2: annual returns table
 
 No look-ahead bias: SMA computed over full history; window trimmed post-hoc.
-Overflow fix: log-space cumprod for wealth index.
 """
 
 from __future__ import annotations
@@ -29,110 +27,25 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
+from metrics import (
+    cagr, annualised_volatility as vol_fn, sharpe_ratio as sharpe_fn,
+    max_drawdown as max_dd, calmar_ratio as calmar, ulcer_index as ulcer,
+    win_rate, best_worst_year as best_worst_yr, dollars_to,
+)
+
 PROC    = Path("data/processed")
 RESULTS = Path("results")
 RESULTS.mkdir(exist_ok=True)
 
-# ---------------------------------------------------------------------------
-# Annualisation
-# ---------------------------------------------------------------------------
 _FACTOR = 12   # monthly data throughout
-
-# ---------------------------------------------------------------------------
-# Safe metric helpers — use log-space wealth to prevent float64 overflow
-# over 60+ year windows
-# ---------------------------------------------------------------------------
-
-def _wealth(ret: pd.Series) -> pd.Series:
-    """Cumulative wealth index via log-space accumulation (overflow-safe)."""
-    r = ret.replace([np.inf, -np.inf], np.nan).fillna(0.0)
-    r = r.clip(-0.9999)          # prevent log(0)
-    return np.exp(np.log1p(r).cumsum())
-
-
-def cagr(ret: pd.Series) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if len(r) < 2:
-        return np.nan
-    w = _wealth(r)
-    years = (r.index[-1] - r.index[0]).days / 365.25
-    if years <= 0:
-        return np.nan
-    return float(w.iloc[-1] ** (1.0 / years) - 1.0)
 
 
 def vol(ret: pd.Series) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    return float(r.std() * np.sqrt(_FACTOR))
+    return vol_fn(ret, "monthly")
 
 
 def sharpe(ret: pd.Series, rf_annual: float = 0.0) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return np.nan
-    rf_pp = (1 + rf_annual) ** (1.0 / _FACTOR) - 1.0
-    excess = r - rf_pp
-    s = excess.std()
-    if s == 0 or np.isnan(s):
-        return np.nan
-    return float(excess.mean() / s * np.sqrt(_FACTOR))
-
-
-def max_dd(ret: pd.Series) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return np.nan
-    w = _wealth(r)
-    dd = (w - w.cummax()) / w.cummax()
-    return float(dd.min())
-
-
-def calmar(ret: pd.Series) -> float:
-    c = cagr(ret)
-    md = max_dd(ret)
-    if np.isnan(c) or np.isnan(md) or md == 0:
-        return np.nan
-    return float(c / abs(md))
-
-
-def ulcer(ret: pd.Series) -> float:
-    """Ulcer Index = RMS of drawdown series (%)."""
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return np.nan
-    w = _wealth(r)
-    dd_pct = ((w - w.cummax()) / w.cummax()) * 100
-    return float(np.sqrt((dd_pct ** 2).mean()))
-
-
-def win_rate(ret: pd.Series) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return np.nan
-    return float((r > 0).mean() * 100)
-
-
-def best_worst_yr(ret: pd.Series):
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return "n/a", "n/a"
-    annual = r.resample("A").apply(lambda x: (1 + x).prod() - 1)
-    best_y  = annual.idxmax().year
-    worst_y = annual.idxmin().year
-    best_v  = annual.max()
-    worst_v = annual.min()
-    sign_b  = "+" if best_v >= 0 else ""
-    sign_w  = "+" if worst_v >= 0 else ""
-    return (f"{sign_b}{best_v*100:.1f}% ({best_y})",
-            f"{sign_w}{worst_v*100:.1f}% ({worst_y})")
-
-
-def dollars_to(ret: pd.Series) -> float:
-    r = ret.replace([np.inf, -np.inf], np.nan).dropna()
-    if r.empty:
-        return np.nan
-    w = _wealth(r)
-    return round(float(w.iloc[-1]), 2)
+    return sharpe_fn(ret, rf_annual, "monthly")
 
 
 def pct_invested(signal: pd.Series) -> float:
@@ -148,7 +61,7 @@ def stats_row(label: str, ret: pd.Series, window: str,
         "Vol%":       round(vol(ret) * 100, 2),
         "Sharpe":     round(sharpe(ret, rf), 3),
         "Max DD%":    round(max_dd(ret) * 100, 2),
-        "Calmar":     round(calmar(ret), 3),
+        "Calmar":     round(calmar(ret, "monthly"), 3),
         "Ulcer%":     round(ulcer(ret), 2),
         "Win%":       round(win_rate(ret), 1),
         "$1→":        dollars_to(ret),
@@ -182,8 +95,9 @@ def load_spliced() -> pd.DataFrame:
 
 
 def load_tlt() -> pd.Series:
-    s = pd.read_csv(PROC / "tlt_monthly_spliced.csv",
-                    index_col=0, parse_dates=True).squeeze("columns")
+    spliced = pd.read_csv(PROC / "prices_monthly_spliced.csv",
+                          index_col=0, parse_dates=True)
+    s = spliced["TLT"].dropna()
     s.name = "TLT"
     return s.sort_index()
 
@@ -235,25 +149,25 @@ def portfolio_bh(rets: pd.DataFrame) -> pd.Series:
     return rets.mean(axis=1)     # same as sum * w / (1/n) — equal weight
 
 
-def portfolio_timing(rets: pd.DataFrame, sigs: pd.DataFrame) -> pd.Series:
+def portfolio_timing_correct(
+    rets: pd.DataFrame,
+    sigs: pd.DataFrame,
+    cash_returns: pd.Series | None = None,
+) -> pd.Series:
     """
-    Timing rule: each asset is invested (weight = 1/N) if signal=1, else cash (0 return).
-    """
-    n = len(rets.columns)
-    w = 1.0 / n
-    timed = rets * sigs.reindex(rets.index).fillna(0)
-    return timed.sum(axis=1) * w / w    # sum of weighted returns
-
-
-# Actually: equal-weight means each slot = 1/N of portfolio.
-# If timing puts asset in cash, that 1/N earns 0%.
-def portfolio_timing_correct(rets: pd.DataFrame, sigs: pd.DataFrame) -> pd.Series:
-    """
-    Each asset gets weight 1/N.  If signal=0, that slice earns 0 (cash).
-    Portfolio return = mean over assets of (ret * signal).
+    Each asset gets equal weight 1/N.
+    If signal=1: that slot earns the asset return.
+    If signal=0: that slot earns the T-bill return (cash_returns) when provided,
+                 or 0% when cash_returns is None.
+    Portfolio return = mean over assets of (ret*sig + cash_ret*(1-sig)).
     """
     sig_aligned = sigs.reindex(rets.index).fillna(0)
-    return (rets * sig_aligned).mean(axis=1)
+    if cash_returns is not None:
+        cr = cash_returns.reindex(rets.index).ffill().fillna(0)
+        timed = rets * sig_aligned + cr.values.reshape(-1, 1) * (1 - sig_aligned)
+    else:
+        timed = rets * sig_aligned
+    return timed.mean(axis=1)
 
 
 # ---------------------------------------------------------------------------
@@ -281,7 +195,8 @@ def run_window(
     window_label: str,
     start: str,
     end: str,
-    asset_names: dict[str, str] | None = None,  # col → display name
+    asset_names: dict[str, str] | None = None,
+    cash_returns: pd.Series | None = None,
 ) -> list[dict]:
     """Slice to window and compute all portfolio variants."""
     r = rets.loc[start:end].copy()
@@ -298,14 +213,18 @@ def run_window(
     # Individual assets B&H + Timing
     for col in cols:
         label = an.get(col, col)
-        rows.append(stats_row(f"{label} B&H",    r[col], window_label))
-        timed_col = r[col] * s[col].reindex(r.index).fillna(0)
-        rows.append(stats_row(f"{label} Timing", timed_col, window_label,
-                              sig=s[col]))
+        rows.append(stats_row(f"{label} B&H", r[col], window_label))
+        sig_col = s[col].reindex(r.index).fillna(0)
+        if cash_returns is not None:
+            cr = cash_returns.reindex(r.index).ffill().fillna(0)
+            timed_col = r[col] * sig_col + cr * (1 - sig_col)
+        else:
+            timed_col = r[col] * sig_col
+        rows.append(stats_row(f"{label} Timing", timed_col, window_label, sig=s[col]))
 
     # Portfolio B&H (equal weight, rebalanced monthly)
     bh  = portfolio_bh(r)
-    tim = portfolio_timing_correct(r, s)
+    tim = portfolio_timing_correct(r, s, cash_returns=cash_returns)
 
     # Combined signal for % invested
     avg_sig = s.mean(axis=1)
@@ -323,6 +242,11 @@ def run_window(
 # PART 1 — Recompute SP500 / IEF (fix overflow)
 # ---------------------------------------------------------------------------
 
+def _cash_returns(spliced: pd.DataFrame) -> pd.Series:
+    """Extract T-bill per-period returns from the BIL column of the spliced DataFrame."""
+    return spliced["BIL"].dropna().pct_change().dropna()
+
+
 def part1_ief(spliced: pd.DataFrame) -> pd.DataFrame:
     print("\n" + "="*70)
     print("PART 1 — SP500 / IEF  (overflow-safe recompute)")
@@ -330,6 +254,7 @@ def part1_ief(spliced: pd.DataFrame) -> pd.DataFrame:
 
     spy = spliced["SPY"].dropna()
     ief = spliced["IEF"].dropna()
+    cr  = _cash_returns(spliced)
 
     price_dict = {"SPY": spy, "IEF": ief}
     rets, sigs = build_portfolio_returns(price_dict, sma_period=SMA)
@@ -345,7 +270,7 @@ def part1_ief(spliced: pd.DataFrame) -> pd.DataFrame:
     ]
 
     for label, start, end in win_labels:
-        rows = run_window(rets, sigs, label, start, end, asset_names=an)
+        rows = run_window(rets, sigs, label, start, end, asset_names=an, cash_returns=cr)
         all_rows.extend(rows)
 
     df = pd.DataFrame(all_rows)
@@ -369,6 +294,7 @@ def part2_triple(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
 
     spy = spliced["SPY"].dropna()
     ief = spliced["IEF"].dropna()
+    cr  = _cash_returns(spliced)
 
     all_rows: list[dict] = []
 
@@ -379,7 +305,7 @@ def part2_triple(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
     anA = {"SPY": "SP500", "Gold": "Gold", "IEF": "IEF"}
 
     for label, start, end in WINDOWS_TRIPLE:
-        rows = run_window(rA, sA, label, start, end, asset_names=anA)
+        rows = run_window(rA, sA, label, start, end, asset_names=anA, cash_returns=cr)
         all_rows.extend(rows)
 
     # Summarise Combo A quickly
@@ -389,7 +315,7 @@ def part2_triple(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
             continue
         s_slice = sA.loc[start:end]
         bh  = portfolio_bh(r)
-        tim = portfolio_timing_correct(r, s_slice)
+        tim = portfolio_timing_correct(r, s_slice, cash_returns=cr)
         c_bh  = cagr(bh)
         c_tim = cagr(tim)
         sh_bh  = sharpe(bh)
@@ -412,7 +338,7 @@ def part2_triple(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
     ]
 
     for label, start, end in win_B:
-        rows = run_window(rB, sB, label, start, end, asset_names=anB)
+        rows = run_window(rB, sB, label, start, end, asset_names=anB, cash_returns=cr)
         all_rows.extend(rows)
 
     for label, start, end in win_B:
@@ -421,7 +347,7 @@ def part2_triple(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
             continue
         s_slice = sB.loc[start:end]
         bh  = portfolio_bh(r)
-        tim = portfolio_timing_correct(r, s_slice)
+        tim = portfolio_timing_correct(r, s_slice, cash_returns=cr)
         c_bh  = cagr(bh)
         c_tim = cagr(tim)
         sh_bh  = sharpe(bh)
@@ -455,6 +381,7 @@ def part3_annual(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
 
     spy = spliced["SPY"].dropna()
     ief = spliced["IEF"].dropna()
+    cr  = _cash_returns(spliced)
 
     # Combo A: SP500 + Gold + IEF (1973+)
     pA = {"SPY": spy, "Gold": gold, "IEF": ief}
@@ -463,7 +390,7 @@ def part3_annual(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
     sA = sA.loc["1973-01-01":"2026-06-30"]
 
     bhA  = portfolio_bh(rA)
-    timA = portfolio_timing_correct(rA, sA)
+    timA = portfolio_timing_correct(rA, sA, cash_returns=cr)
 
     # Combo B: SP500 + Gold + TLT (1977+)
     pB = {"SPY": spy, "Gold": gold, "TLT": tlt}
@@ -472,13 +399,13 @@ def part3_annual(spliced: pd.DataFrame, tlt: pd.Series, gold: pd.Series) -> pd.D
     sB = sB.loc["1977-01-01":"2026-06-30"]
 
     bhB  = portfolio_bh(rB)
-    timB = portfolio_timing_correct(rB, sB)
+    timB = portfolio_timing_correct(rB, sB, cash_returns=cr)
 
     # SP500 for reference
     spy_rets = spy.pct_change().dropna().loc["1973-01-01":"2026-06-30"]
 
     def annual(s: pd.Series, label: str) -> pd.Series:
-        return (s.resample("A").apply(lambda x: (1 + x).prod() - 1)
+        return (s.resample("YE").apply(lambda x: (1 + x).prod() - 1)
                  .rename(lambda idx: idx.year)
                  .rename(label))
 

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>60/40 Portfolio (S&P 500 / IEF) — Buy &amp; Hold vs Timing (SMA-10)</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;
+        line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 48px}
+  .page{max-width:760px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+  h2{font-size:1.05rem;font-weight:600;margin:28px 0 8px;color:#1f2328;
+      border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  .subtitle{color:#57606a;font-size:.88rem;margin-bottom:20px}
+  .meta{font-size:.82rem;color:#57606a;margin-bottom:16px}
+  .period-block{margin-bottom:24px}
+  .period-label{font-size:.9rem;font-weight:600;color:#1f2328;margin-bottom:3px}
+  .period-sub{font-size:.8rem;color:#57606a;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 8px;text-align:left;
+      font-weight:600;color:#57606a;white-space:nowrap}
+  td{border:1px solid #e5e7eb;padding:5px 8px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .end-dollar{font-weight:600}
+  .bh-row{background:#fff}
+  .timing-row{background:#f0f6ff}
+  .neg{color:#cf222e;font-weight:600}
+  .warn{color:#9a6700}
+  th.hi{color:#3b82d4}
+  .chart-img{width:100%;height:auto;display:block;border:1px solid #e5e7eb;
+              border-radius:4px;margin-bottom:6px}
+  .chart-note{font-size:.78rem;color:#57606a;text-align:center;margin-bottom:16px}
+  .method-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+               padding:14px 16px;font-size:.82rem;color:#57606a;margin-top:6px}
+  .method-box p{margin-bottom:6px}
+  .method-box p:last-child{margin-bottom:0}
+  .method-box b{color:#1f2328}
+  footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;
+          text-align:center;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>60/40 Portfolio (S&amp;P 500 / IEF): Buy &amp; Hold vs. Timing (SMA-10)</h1>
+<p class="subtitle">60/40 S&amp;P 500 / IEF · Annual rebalancing at year-end</p>
+<p class="meta">Data: Shiller S&amp;P 500 total-return index (1871–) and FRED DGS10 yield-derived bond return (1962–),
+both spliced with SPY/IEF ETFs at their respective launch dates.
+Cash: FRED TB3MS 3-month T-bill spliced with BIL ETF.
+SMA warm-up uses 1962 prices; first reported signal Jan 1963 (1966 study uses 4 years of warm-up).
+Annual rebalance: portfolio reset to 60/40 target weights every January.</p>
+
+<h2>Performance Summary by Period</h2>
+<p class="meta">Timing rule: each leg independently timed — invested when prior month-end price &gt; SMA-10, else T-bills.
+1-month lag, no look-ahead. Portfolio rebalanced to 60/40 each January.</p>
+
+
+<div class="period-block">
+  <div class="period-label">1966–Jun 2026</div>
+  <div class="period-sub">Jan 1966 – Jun 2026 (60 years) &middot; 727 months</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th>
+      <th class="num">Volatility</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Avg DD</th>
+      <th class="num hi">Ulcer</th>
+      <th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+9.19%</td>
+  <td class="num">8.87%</td>
+  <td class="num">1.038</td>
+  <td class="num neg">-26.76%</td>
+  <td class="num">-3.05%</td>
+  <td class="num">5.65</td>
+  <td class="num end-dollar">$204.30</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+9.26%</td>
+  <td class="num">6.68%</td>
+  <td class="num">1.362</td>
+  <td class="num warn">-14.60%</td>
+  <td class="num">-1.61%</td>
+  <td class="num">2.93</td>
+  <td class="num end-dollar">$212.52</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="period-block">
+  <div class="period-label">1973–Jun 2026</div>
+  <div class="period-sub">Jan 1973 – Jun 2026 (53 years) &middot; 643 months</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th>
+      <th class="num">Volatility</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Avg DD</th>
+      <th class="num hi">Ulcer</th>
+      <th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+9.61%</td>
+  <td class="num">9.04%</td>
+  <td class="num">1.062</td>
+  <td class="num neg">-26.76%</td>
+  <td class="num">-3.05%</td>
+  <td class="num">5.73</td>
+  <td class="num end-dollar">$135.27</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+9.49%</td>
+  <td class="num">6.86%</td>
+  <td class="num">1.358</td>
+  <td class="num warn">-14.60%</td>
+  <td class="num">-1.70%</td>
+  <td class="num">3.07</td>
+  <td class="num end-dollar">$127.92</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="period-block">
+  <div class="period-label">2000–Jun 2026</div>
+  <div class="period-sub">Jan 2000 – Jun 2026 (26 years) &middot; 319 months</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th>
+      <th class="num">Volatility</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Avg DD</th>
+      <th class="num hi">Ulcer</th>
+      <th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+7.25%</td>
+  <td class="num">8.91%</td>
+  <td class="num">0.830</td>
+  <td class="num neg">-26.76%</td>
+  <td class="num">-3.60%</td>
+  <td class="num">6.53</td>
+  <td class="num end-dollar">$6.39</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+6.53%</td>
+  <td class="num">6.28%</td>
+  <td class="num">1.037</td>
+  <td class="num warn">-14.60%</td>
+  <td class="num">-2.09%</td>
+  <td class="num">3.66</td>
+  <td class="num end-dollar">$5.34</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Charts</h2>
+
+<h2>Figure 1 — 1966–Jun 2026</h2>
+<p class="chart-note">$1 invested &middot; log scale (top) &middot; drawdown + avg DD lines (bottom)
+&middot; B&amp;H $204.30 | Timing $212.52</p>
+<img class="chart-img" src="6040_equity_curve_1966-jun_2026.png"
+     alt="60/40 Buy &amp; Hold vs Timing SMA-10, 1966–Jun 2026">
+
+<h2>Figure 2 — 1973–Jun 2026</h2>
+<p class="chart-note">$1 invested &middot; log scale (top) &middot; drawdown + avg DD lines (bottom)
+&middot; B&amp;H $135.27 | Timing $127.92</p>
+<img class="chart-img" src="6040_equity_curve_1973-jun_2026.png"
+     alt="60/40 Buy &amp; Hold vs Timing SMA-10, 1973–Jun 2026">
+
+<h2>Figure 3 — 2000–Jun 2026</h2>
+<p class="chart-note">$1 invested &middot; log scale (top) &middot; drawdown + avg DD lines (bottom)
+&middot; B&amp;H $6.39 | Timing $5.34</p>
+<img class="chart-img" src="6040_equity_curve_2000-jun_2026.png"
+     alt="60/40 Buy &amp; Hold vs Timing SMA-10, 2000–Jun 2026">
+
+
+<h2>Methodology</h2>
+<div class="method-box">
+  <p><b>Portfolio construction:</b> 60/40 S&amp;P 500 / IEF, rebalanced annually at the start of each January.
+     Between rebalances the weights drift with market returns.</p>
+  <p><b>Timing rule:</b> Each leg is timed independently. At each month-end compare that asset's price to its
+     10-month SMA. Price &gt; SMA &rarr; invested. Price &le; SMA &rarr; exit to T-bills.
+     Signal at close of t&minus;1, applied to return of month t (1-month lag).</p>
+  <p><b>Rebalancing interaction:</b> Annual rebalance resets the <em>notional allocation</em> between legs;
+     the timing signal within each leg is unaffected.</p>
+  <p><b>Bond return model:</b> Yield-dependent modified duration + convexity correction on the FRED DGS10 series.
+     Spliced with IEF ETF total-return from 2002.</p>
+  <p><b>Cash:</b> FRED TB3MS 3-month T-bill (1934–). Spliced with BIL ETF from 2007.</p>
+  <p><b>No transaction costs, taxes or leverage.</b></p>
+</div>
+
+</div>
+<footer>Made with IBM Bob</footer>
+</body></html>

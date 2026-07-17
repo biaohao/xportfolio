@@ -23,41 +23,21 @@ import sys
 from pathlib import Path
 
 import pandas as pd
-import yaml
 
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT
+
 RAW_ETF = ROOT / "data" / "raw" / "etf"
 RAW_LONG = ROOT / "data" / "raw" / "longhistory"
 PROCESSED = ROOT / "data" / "processed"
 
-# Mapping from config asset ticker → long-history CSV column and file
-# Only assets that have a long-history source are listed here.
-LONG_HISTORY_MAP = {
-    "SPY": ("SP500_TR", RAW_LONG / "sp500_shiller.csv"),
-    "IEF": ("BONDS_TR", RAW_LONG / "bonds_fred.csv"),
-    # Gold: monthly price series from GitHub datasets/gold-prices (1973+).
-    # Gold pays no dividend, so price return IS total return.
-    # Use GLD ETF as the post-2004 source (no futures roll cost).
-    "GLD": ("Gold", PROCESSED / "gold_monthly.csv"),
-}
-# Cash proxy mapping
-CASH_LONG_MAP = {
-    "BIL": ("TBILL_TR", RAW_LONG / "tbill_fred.csv"),
-}
 
 
 # ---------------------------------------------------------------------------
@@ -144,12 +124,29 @@ def splice(long_series: pd.Series, etf_series: pd.Series) -> pd.Series:
 # Main
 # ---------------------------------------------------------------------------
 
+def _build_long_history_map(cfg: dict) -> dict[str, tuple[str, Path]]:
+    """
+    Build the long-history map from config.yaml at runtime.
+
+    Returns {ticker: (column_name, Path)} for every entry under
+    long_history_sources.  Paths are resolved relative to ROOT so they
+    work regardless of the working directory.
+    """
+    sources = cfg.get("long_history_sources", {})
+    result: dict[str, tuple[str, Path]] = {}
+    for ticker, entry in sources.items():
+        result[ticker] = (entry["column"], ROOT / entry["file"])
+    return result
+
+
 def main() -> None:
-    with open(CONFIG_PATH) as fh:
-        cfg = yaml.safe_load(fh)
+    cfg = load_config()
 
     all_tickers = list(cfg["assets"].keys())
     cash_ticker = cfg["cash_proxy"]
+
+    # Build the long-history map from config — no hardcoded paths in code.
+    long_history_map = _build_long_history_map(cfg)
 
     log.info("=== Splice long-history + ETF data ===")
 
@@ -157,7 +154,7 @@ def main() -> None:
     # 1.  Build long-history monthly DataFrame (raw, no splicing yet)
     # ------------------------------------------------------------------
     long_frames: dict[str, pd.Series] = {}
-    for ticker, (col, path) in {**LONG_HISTORY_MAP, **CASH_LONG_MAP}.items():
+    for ticker, (col, path) in long_history_map.items():
         s = load_long_history(col, path)
         if not s.empty:
             s.name = ticker
@@ -259,4 +256,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     main()

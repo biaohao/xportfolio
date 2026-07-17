@@ -16,14 +16,13 @@ import sys
 from pathlib import Path
 
 import pandas as pd
-import yaml
 
 from metrics import compute_all_metrics
 from strategy import run_backtest
 from report import load_prices, resolve_window, resolve_rf, _trim_result_to_window
 
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT
+
 RESULTS = ROOT / "results"
 
 # ---------------------------------------------------------------------------
@@ -99,8 +98,7 @@ def run_portfolio(
 
 
 def main():
-    with open(CONFIG_PATH) as fh:
-        cfg = yaml.safe_load(fh)
+    cfg = load_config()
 
     cash_ticker = cfg["cash_proxy"]
     sma_periods: dict = cfg["strategy"]["sma_periods"]

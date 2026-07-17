@@ -20,35 +20,20 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-import yaml
 import yfinance as yf
 
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 log = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT
+
 RAW_DIR = ROOT / "data" / "raw" / "etf"
 PROCESSED_DIR = ROOT / "data" / "processed"
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def load_config() -> dict:
-    with open(CONFIG_PATH) as fh:
-        return yaml.safe_load(fh)
 
 
 def resolve_end_date(end_date_str: str) -> str:
@@ -64,11 +49,21 @@ def fetch_ticker(
     end: str,
     raw_dir: Path,
     refresh: bool,
+    yf_ticker: str | None = None,
 ) -> pd.Series:
     """
     Download adjusted-close for a single ticker and cache to CSV.
-    Returns a Series named after the ticker.
+
+    Parameters
+    ----------
+    ticker    : Config key / column name used throughout the project (e.g. "BTC").
+    yf_ticker : Yahoo Finance symbol to query (defaults to ``ticker`` when None).
+                Use this when the config key differs from the YF symbol, e.g.
+                ticker="BTC", yf_ticker="BTC-USD".
+
+    Returns a Series named after ``ticker``.
     """
+    yf_sym = yf_ticker or ticker
     cache_path = raw_dir / f"{ticker}.csv"
 
     if cache_path.exists() and not refresh:
@@ -79,9 +74,9 @@ def fetch_ticker(
                  ticker, series.index.min().date(), series.index.max().date(), len(series))
         return series
 
-    log.info("  %s  — downloading from Yahoo Finance …", ticker)
+    log.info("  %s  — downloading from Yahoo Finance (symbol: %s) …", ticker, yf_sym)
     raw = yf.download(
-        ticker,
+        yf_sym,
         start=start,
         end=end,
         auto_adjust=True,
@@ -116,6 +111,7 @@ def main(refresh: bool = False) -> None:
     cfg = load_config()
 
     tickers: list[str] = list(cfg["assets"].keys()) + [cfg["cash_proxy"]]
+    overrides: dict[str, str] = cfg.get("etf_ticker_overrides", {})
     start: str = cfg["data"]["etf_start_date"]
     end: str = resolve_end_date(cfg["data"]["end_date"])
 
@@ -127,7 +123,8 @@ def main(refresh: bool = False) -> None:
 
     series_list: list[pd.Series] = []
     for ticker in tickers:
-        s = fetch_ticker(ticker, start, end, RAW_DIR, refresh)
+        s = fetch_ticker(ticker, start, end, RAW_DIR, refresh,
+                         yf_ticker=overrides.get(ticker))
         if not s.empty:
             series_list.append(s)
 
@@ -178,6 +175,11 @@ def main(refresh: bool = False) -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     parser = argparse.ArgumentParser(description="Fetch ETF adjusted-close data from Yahoo Finance.")
     parser.add_argument(
         "--refresh",

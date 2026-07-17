@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLT — Buy &amp; Hold vs Timing (SMA-10) | 1963–2026</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;
+        line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 48px}
+  .page{max-width:760px;margin:0 auto}
+  h1{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+  h2{font-size:1.05rem;font-weight:600;margin:28px 0 8px;color:#1f2328;
+      border-bottom:1px solid #e5e7eb;padding-bottom:4px}
+  .subtitle{color:#57606a;font-size:.88rem;margin-bottom:20px}
+  .meta{font-size:.82rem;color:#57606a;margin-bottom:16px}
+  .period-block{margin-bottom:24px}
+  .period-label{font-size:.9rem;font-weight:600;color:#1f2328;margin-bottom:3px}
+  .period-sub{font-size:.8rem;color:#57606a;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th{background:#f7f8fa;border:1px solid #e5e7eb;padding:6px 8px;text-align:left;
+      font-weight:600;color:#57606a;white-space:nowrap}
+  td{border:1px solid #e5e7eb;padding:5px 8px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .end-dollar{font-weight:600}
+  .bh-row{background:#fff}
+  .timing-row{background:#f0f6ff}
+  .neg{color:#cf222e;font-weight:600}
+  .warn{color:#9a6700}
+  th.hi{color:#3b82d4}
+  .chart-img{width:100%;height:auto;display:block;border:1px solid #e5e7eb;
+              border-radius:4px;margin-bottom:6px}
+  .chart-note{font-size:.78rem;color:#57606a;text-align:center;margin-bottom:16px}
+  .method-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+               padding:14px 16px;font-size:.82rem;color:#57606a;margin-top:6px}
+  .method-box p{margin-bottom:6px}
+  .method-box p:last-child{margin-bottom:0}
+  .method-box b{color:#1f2328}
+  .dl-box{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:4px;
+           padding:10px 14px;font-size:.82rem;margin:8px 0 20px}
+  footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;
+          text-align:center;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>TLT: Buy &amp; Hold vs. Timing (SMA-10)</h1>
+<p class="subtitle">US 20-Year Treasury Bond — 63 years of monthly data, 1963–Jun 2026</p>
+<p class="meta">Data: FRED DGS20 yield-derived total-return index (1962–) spliced with TLT ETF (2002–present).
+Bond return = coupon income + duration-based price change + convexity correction (yield-dependent modified
+duration for a 20-year par bond, N=20). DGS20 gap Jan 1987–Sep 1993 filled by OLS from DGS10+DGS30.
+Cash: FRED TB3MS T-bill (1934–present). SMA warm-up uses 1962 prices; first reported signal Jan 1963.</p>
+
+<div class="dl-box">
+  <b>Raw data export:</b> <code>tlt_bh_timing_1963_2026.csv</code> — 763 monthly rows (Jan 1963–Jun 2026) with columns:
+  <code>price, sma10, signal, monthly_ret_bh, monthly_ret_timing, equity_bh, equity_timing,
+  drawdown_bh_pct, drawdown_timing_pct</code>
+</div>
+
+<h2>Performance Summary by Period</h2>
+<p class="meta">Rule: invested when prior month-end price &gt; SMA-10, else T-bills. 1-month lag, no look-ahead.</p>
+
+<div class="period-block">
+  <div class="period-label">1963–Jun 2026</div>
+  <div class="period-sub">Jan 1963 – Jun 2026 (63 years)</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th><th class="num">Volatility</th>
+      <th class="num">Sharpe</th><th class="num">Max DD</th>
+      <th class="num hi">Ulcer Index</th><th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+5.92%</td><td class="num">11.39%</td>
+  <td class="num">0.185</td><td class="num neg">-47.61%</td>
+  <td class="num">12.24</td><td class="num end-dollar">$38.40</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+6.00%</td><td class="num">9.28%</td>
+  <td class="num">0.212</td><td class="num warn">-24.47%</td>
+  <td class="num">7.97</td><td class="num end-dollar">$40.36</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="period-block">
+  <div class="period-label">1973–Jun 2026</div>
+  <div class="period-sub">Jan 1973 – Jun 2026 (53 years)</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th><th class="num">Volatility</th>
+      <th class="num">Sharpe</th><th class="num">Max DD</th>
+      <th class="num hi">Ulcer Index</th><th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+6.55%</td><td class="num">12.06%</td>
+  <td class="num">0.234</td><td class="num neg">-47.61%</td>
+  <td class="num">12.99</td><td class="num end-dollar">$29.62</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+6.42%</td><td class="num">9.85%</td>
+  <td class="num">0.250</td><td class="num warn">-24.47%</td>
+  <td class="num">8.50</td><td class="num end-dollar">$27.70</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="period-block">
+  <div class="period-label">2000–Jun 2026</div>
+  <div class="period-sub">Jan 2000 – Jun 2026 (26 years)</div>
+  <table>
+    <thead><tr>
+      <th>Strategy</th>
+      <th class="num">CAGR</th><th class="num">Volatility</th>
+      <th class="num">Sharpe</th><th class="num">Max DD</th>
+      <th class="num hi">Ulcer Index</th><th class="num hi">$1 &rarr;</th>
+    </tr></thead>
+    <tbody>
+<tr class="bh-row"><td>Buy &amp; Hold</td>
+  <td class="num">+4.54%</td><td class="num">13.09%</td>
+  <td class="num">0.264</td><td class="num neg">-47.61%</td>
+  <td class="num">17.48</td><td class="num end-dollar">$3.23</td></tr>
+<tr class="timing-row"><td>Timing SMA-10</td>
+  <td class="num">+3.43%</td><td class="num">10.78%</td>
+  <td class="num">0.195</td><td class="num warn">-24.47%</td>
+  <td class="num">11.56</td><td class="num end-dollar">$2.44</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>Figure 1 — 1963–Jun 2026</h2>
+<p class="chart-note">$1 invested January 1963 &middot; log scale (top) &middot; drawdown (bottom) &middot; B&amp;H $38.40 | Timing $40.36</p>
+<img class="chart-img" src="tlt_equity_curve_1963-jun_2026.png"
+     alt="TLT Buy &amp; Hold vs Timing SMA-10, 1963–Jun 2026 — equity curve and drawdown">
+
+<h2>Figure 2 — 1973–Jun 2026</h2>
+<p class="chart-note">$1 invested January 1973 &middot; log scale (top) &middot; drawdown (bottom) &middot; B&amp;H $29.62 | Timing $27.70</p>
+<img class="chart-img" src="tlt_equity_curve_1973-jun_2026.png"
+     alt="TLT Buy &amp; Hold vs Timing SMA-10, 1973–Jun 2026 — equity curve and drawdown">
+
+<h2>Figure 3 — 2000–Jun 2026</h2>
+<p class="chart-note">$1 invested January 2000 &middot; log scale (top) &middot; drawdown (bottom) &middot; B&amp;H $3.23 | Timing $2.44</p>
+<img class="chart-img" src="tlt_equity_curve_2000-jun_2026.png"
+     alt="TLT Buy &amp; Hold vs Timing SMA-10, 2000–Jun 2026 — equity curve and drawdown">
+
+<h2>Methodology</h2>
+<div class="method-box">
+  <p><b>Timing rule:</b> At each month-end compare price to 10-month SMA. Price &gt; SMA &rarr; invested in TLT.
+     Price &le; SMA &rarr; exit to T-bills. Signal at close of t&minus;1, applied to return of month t (1-month lag).</p>
+  <p><b>SMA warm-up:</b> Full-year 1962 prices used to seed the SMA. First signal = Jan 1963. No look-ahead bias.</p>
+  <p><b>Base date:</b> For a period starting Jan YYYY, $1 is invested at Dec (YYYY&minus;1) close.
+     <code>pct_change()</code> is called on the full price series; the return series is then trimmed to the window start,
+     so the first month's return is never lost.</p>
+  <p><b>Bond return model:</b> Monthly return = coupon income (y/12) &minus; D_mod(y,20) &times; &Delta;y
+     + &frac12; C(y,20) &times; &Delta;y&sup2;, where D_mod and C are the yield-dependent modified duration and
+     convexity of a 20-year par bond (versus 10-year for IEF). At typical yields (4–8%) TLT has
+     D_mod &asymp; 11–13 years versus IEF &asymp; 7–8 years, giving roughly 1.6&times; more interest-rate
+     sensitivity. The DGS20 gap (Jan 1987–Sep 1993) is filled by OLS interpolation from DGS10 and DGS30.</p>
+  <p><b>Cash:</b> FRED TB3MS 3-month T-bill (1934&ndash;). Spliced with BIL ETF from 2007.</p>
+  <p><b>No costs, taxes or leverage.</b></p>
+</div>
+
+</div>
+<footer>Made with IBM Bob</footer>
+</body></html>

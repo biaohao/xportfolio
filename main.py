@@ -44,6 +44,9 @@ def step_fetch(refresh: bool = False) -> None:
     import fetch_longhistory
     fetch_longhistory.main(refresh=refresh)
 
+    import fetch_bitcoin
+    fetch_bitcoin.main(refresh=refresh)
+
     import splice_data
     splice_data.main()
     log.info("")
@@ -52,10 +55,9 @@ def step_fetch(refresh: bool = False) -> None:
 def step_backtest() -> None:
     log.info("=== STEP 2/3: Running backtests ===")
     import report
-    report.main()
-
     import plot
-    plot.main()
+    _, results = report.main()
+    plot.main(results=results)
     log.info("")
 
 
@@ -117,8 +119,8 @@ def main() -> None:
         import report
         import plot
         freqs = [args.freq] if args.freq else None
-        report.main(frequencies=freqs)
-        plot.main(frequencies=freqs)
+        _, results = report.main(frequencies=freqs)
+        plot.main(frequencies=freqs, results=results)
 
     elif args.signals:
         freqs = [args.freq] if args.freq else None

@@ -22,24 +22,18 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml
 import yfinance as yf
 
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 log = logging.getLogger(__name__)
 
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT
+
 RESULTS_DIR = ROOT / "results"
 
 # Resample rules per frequency
 _RESAMPLE = {
-    "monthly": "M",
+    "monthly": "ME",
     "weekly": "W-FRI",
     "daily": "D",
 }
@@ -163,8 +157,7 @@ def _days_to_next_rebalance(frequency: str) -> int:
 # ---------------------------------------------------------------------------
 
 def generate_signals(frequencies: list[str] | None = None) -> pd.DataFrame:
-    with open(CONFIG_PATH) as fh:
-        cfg = yaml.safe_load(fh)
+    cfg = load_config()
 
     if frequencies is None:
         frequencies = cfg["strategy"]["rebalance_frequencies"]
@@ -287,6 +280,11 @@ def _print_signals(df: pd.DataFrame, cfg: dict) -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     parser = argparse.ArgumentParser(description="Generate live BUY/SELL signals for GTAA assets.")
     parser.add_argument(
         "--freq",

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>5-Asset Class Statistics — 3 Periods</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 48px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:19px;font-weight:700;margin-bottom:4px}
+.subtitle{color:#57606a;font-size:12px;margin-bottom:20px}
+h2{font-size:14px;font-weight:700;margin:28px 0 8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
+h3{font-size:12.5px;font-weight:700;margin:20px 0 6px;color:#57606a;text-transform:uppercase;letter-spacing:.04em}
+.chart-wrap{background:#fafafa;border:1px solid #e5e7eb;border-radius:6px;padding:8px;margin-bottom:6px}
+.chart-img{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin:6px 0 18px;font-size:12px;padding-left:4px}
+.leg-item{display:flex;align-items:center;gap:6px}
+.leg-line{width:20px;height:3px;border-radius:2px;flex-shrink:0}
+table{border-collapse:collapse;width:100%;font-size:11.5px;margin:8px 0 6px}
+th{background:#f7f8fa;border:1px solid #e5e7eb;padding:5px 7px;text-align:right;font-weight:600;color:#57606a;font-size:10.5px;text-transform:uppercase;white-space:nowrap;letter-spacing:.03em}
+th:first-child{text-align:left;min-width:180px}
+td{border:1px solid #e5e7eb;padding:5px 7px;text-align:right;white-space:nowrap}
+td:first-child{text-align:left;font-weight:600}
+tr:hover td{background:#f7f8fa}
+.pos{color:#1a7f37;font-weight:600}
+.neg{color:#cf222e;font-weight:600}
+.neu{color:#57606a}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.note{font-size:11px;color:#57606a;font-style:italic;margin:8px 0 0;line-height:1.5}
+footer{text-align:center;font-size:12px;color:#57606a;margin-top:40px;padding-top:14px;border-top:1px solid #e5e7eb}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>5-Asset Class Statistics — SP500 · TLT · IEF · Gold · T-Bills</h1>
+<p class="subtitle">Three periods: 1973–Jun 2026 · 2000–Jun 2026 · 1973–2012 &nbsp;·&nbsp;
+Monthly total-return series, no costs or taxes &nbsp;·&nbsp;
+SPY = Shiller TR+ETF splice · TLT/IEF = FRED yield-derived total-return+ETF splice ·
+GLD = LBMA gold spot+ETF splice · BIL = FRED TB3MS+ETF splice</p>
+
+
+<h2>1973–Jun 2026</h2>
+<div class="chart-wrap">
+  <img class="chart-img" src="asset_stats_equity_1973-jun_2026.png"
+       alt="5-asset equity curves and drawdowns, 1973–Jun 2026">
+</div>
+<div class="legend"><span class="leg-item"><span class="leg-line" style="background:#2563eb"></span>S&P 500 (SPY)</span> <span class="leg-item"><span class="leg-line" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</span> <span class="leg-item"><span class="leg-line" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</span> <span class="leg-item"><span class="leg-line" style="background:#d97706"></span>Gold (GLD)</span> <span class="leg-item"><span class="leg-line" style="background:#9ca3af"></span>T-Bills (BIL)</span></div>
+
+<h3>Summary Statistics &mdash; 1973–Jun 2026</h3>
+<table>
+  <tr>
+    <th>Asset</th><th>CAGR</th><th>Vol</th><th>Sharpe</th>
+    <th>Max DD</th><th>Ulcer</th><th>$1 &rarr;</th>
+    <th>Best Year</th><th>Worst Year</th>
+    <th>DD Peak</th><th>DD Trough</th><th>Duration</th><th>Recovery</th>
+  </tr>
+  <tr><td><span class="dot" style="background:#2563eb"></span>S&P 500 (SPY)</td><td class="pos">+10.98%</td><td>14.12%</td><td class="pos">0.508</td><td class="neg">-50.78%</td><td>12.68</td><td class="pos">$260.54</td><td class="pos">+38.0% (1995)</td><td class="neg">-36.8% (2008)</td><td class="neu">2007-10-31</td><td class="neu">2009-02-28</td><td class="neu">16m</td><td class="neu">2012-03-31</td></tr>
+<tr><td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</td><td class="pos">+6.55%</td><td>12.06%</td><td class="pos">0.234</td><td class="neg">-47.61%</td><td>12.99</td><td class="pos">$29.62</td><td class="pos">+45.7% (1982)</td><td class="neg">-31.2% (2022)</td><td class="neu">2020-07-31</td><td class="neu">2023-10-31</td><td class="neu">39m</td><td class="neu"><em style="color:#d97706">Not yet</em></td></tr>
+<tr><td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</td><td class="pos">+6.49%</td><td>7.70%</td><td class="pos">0.305</td><td class="neg">-23.15%</td><td>5.66</td><td class="pos">$28.78</td><td class="pos">+39.1% (1982)</td><td class="neg">-15.2% (2022)</td><td class="neu">2020-07-31</td><td class="neu">2023-10-31</td><td class="neu">39m</td><td class="neu"><em style="color:#d97706">Not yet</em></td></tr>
+<tr><td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td><td class="pos">+7.83%</td><td>18.47%</td><td class="pos">0.267</td><td class="neg">-62.09%</td><td>34.64</td><td class="pos">$56.05</td><td class="pos">+118.9% (1979)</td><td class="neg">-28.3% (2013)</td><td class="neu">1980-01-31</td><td class="neu">1999-07-31</td><td class="neu">234m</td><td class="neu">2007-09-30</td></tr>
+<tr><td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td><td class="pos">+4.33%</td><td>0.95%</td><td class="neg">0.000</td><td class="neg">-0.42%</td><td>0.09</td><td class="pos">$9.62</td><td class="pos">+14.0% (1981)</td><td class="neg">-0.1% (2015)</td><td class="neu">2009-10-31</td><td class="neu">2015-10-31</td><td class="neu">72m</td><td class="neu">2017-08-31</td></tr>
+
+</table>
+
+<h2>2000–Jun 2026</h2>
+<div class="chart-wrap">
+  <img class="chart-img" src="asset_stats_equity_2000-jun_2026.png"
+       alt="5-asset equity curves and drawdowns, 2000–Jun 2026">
+</div>
+<div class="legend"><span class="leg-item"><span class="leg-line" style="background:#2563eb"></span>S&P 500 (SPY)</span> <span class="leg-item"><span class="leg-line" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</span> <span class="leg-item"><span class="leg-line" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</span> <span class="leg-item"><span class="leg-line" style="background:#d97706"></span>Gold (GLD)</span> <span class="leg-item"><span class="leg-line" style="background:#9ca3af"></span>T-Bills (BIL)</span></div>
+
+<h3>Summary Statistics &mdash; 2000–Jun 2026</h3>
+<table>
+  <tr>
+    <th>Asset</th><th>CAGR</th><th>Vol</th><th>Sharpe</th>
+    <th>Max DD</th><th>Ulcer</th><th>$1 &rarr;</th>
+    <th>Best Year</th><th>Worst Year</th>
+    <th>DD Peak</th><th>DD Trough</th><th>Duration</th><th>Recovery</th>
+  </tr>
+  <tr><td><span class="dot" style="background:#2563eb"></span>S&P 500 (SPY)</td><td class="pos">+8.25%</td><td>15.19%</td><td class="pos">0.476</td><td class="neg">-50.78%</td><td>15.68</td><td class="pos">$8.11</td><td class="pos">+32.3% (2013)</td><td class="neg">-36.8% (2008)</td><td class="neu">2007-10-31</td><td class="neu">2009-02-28</td><td class="neu">16m</td><td class="neu">2012-03-31</td></tr>
+<tr><td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</td><td class="pos">+4.54%</td><td>13.09%</td><td class="pos">0.264</td><td class="neg">-47.61%</td><td>17.48</td><td class="pos">$3.23</td><td class="pos">+34.0% (2011)</td><td class="neg">-31.2% (2022)</td><td class="neu">2020-07-31</td><td class="neu">2023-10-31</td><td class="neu">39m</td><td class="neu"><em style="color:#d97706">Not yet</em></td></tr>
+<tr><td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</td><td class="pos">+4.34%</td><td>6.70%</td><td class="pos">0.394</td><td class="neg">-23.15%</td><td>7.01</td><td class="pos">$3.07</td><td class="pos">+17.9% (2008)</td><td class="neg">-15.2% (2022)</td><td class="neu">2020-07-31</td><td class="neu">2023-10-31</td><td class="neu">39m</td><td class="neu"><em style="color:#d97706">Not yet</em></td></tr>
+<tr><td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td><td class="pos">+10.09%</td><td>16.14%</td><td class="pos">0.565</td><td class="neg">-42.91%</td><td>17.30</td><td class="pos">$12.68</td><td class="pos">+63.7% (2025)</td><td class="neg">-28.3% (2013)</td><td class="neu">2011-08-31</td><td class="neu">2015-12-31</td><td class="neu">52m</td><td class="neu">2020-07-31</td></tr>
+<tr><td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td><td class="pos">+1.85%</td><td>0.58%</td><td class="neg">0.000</td><td class="neg">-0.42%</td><td>0.13</td><td class="pos">$1.62</td><td class="pos">+5.8% (2000)</td><td class="neg">-0.1% (2015)</td><td class="neu">2009-10-31</td><td class="neu">2015-10-31</td><td class="neu">72m</td><td class="neu">2017-08-31</td></tr>
+
+</table>
+
+<h2>1973–2012</h2>
+<div class="chart-wrap">
+  <img class="chart-img" src="asset_stats_equity_1973-2012.png"
+       alt="5-asset equity curves and drawdowns, 1973–2012">
+</div>
+<div class="legend"><span class="leg-item"><span class="leg-line" style="background:#2563eb"></span>S&P 500 (SPY)</span> <span class="leg-item"><span class="leg-line" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</span> <span class="leg-item"><span class="leg-line" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</span> <span class="leg-item"><span class="leg-line" style="background:#d97706"></span>Gold (GLD)</span> <span class="leg-item"><span class="leg-line" style="background:#9ca3af"></span>T-Bills (BIL)</span></div>
+
+<h3>Summary Statistics &mdash; 1973–2012</h3>
+<table>
+  <tr>
+    <th>Asset</th><th>CAGR</th><th>Vol</th><th>Sharpe</th>
+    <th>Max DD</th><th>Ulcer</th><th>$1 &rarr;</th>
+    <th>Best Year</th><th>Worst Year</th>
+    <th>DD Peak</th><th>DD Trough</th><th>Duration</th><th>Recovery</th>
+  </tr>
+  <tr><td><span class="dot" style="background:#2563eb"></span>S&P 500 (SPY)</td><td class="pos">+9.64%</td><td>14.07%</td><td class="pos">0.360</td><td class="neg">-50.78%</td><td>14.29</td><td class="pos">$39.46</td><td class="pos">+38.0% (1995)</td><td class="neg">-36.8% (2008)</td><td class="neu">2007-10-31</td><td class="neu">2009-02-28</td><td class="neu">16m</td><td class="neu">2012-03-31</td></tr>
+<tr><td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT) (TLT)</td><td class="pos">+8.76%</td><td>11.64%</td><td class="pos">0.337</td><td class="neg">-22.59%</td><td>6.53</td><td class="pos">$28.59</td><td class="pos">+45.7% (1982)</td><td class="neg">-21.8% (2009)</td><td class="neu">1979-06-30</td><td class="neu">1981-09-30</td><td class="neu">27m</td><td class="neu">1982-08-31</td></tr>
+<tr><td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF) (IEF)</td><td class="pos">+8.33%</td><td>8.06%</td><td class="pos">0.396</td><td class="neg">-15.41%</td><td>3.48</td><td class="pos">$24.42</td><td class="pos">+39.1% (1982)</td><td class="neg">-7.7% (1999)</td><td class="neu">1979-06-30</td><td class="neu">1980-02-29</td><td class="neu">8m</td><td class="neu">1980-05-31</td></tr>
+<tr><td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td><td class="pos">+8.36%</td><td>19.27%</td><td class="pos">0.241</td><td class="neg">-62.09%</td><td>37.67</td><td class="pos">$24.65</td><td class="pos">+118.9% (1979)</td><td class="neg">-24.5% (1975)</td><td class="neu">1980-01-31</td><td class="neu">1999-07-31</td><td class="neu">234m</td><td class="neu">2007-09-30</td></tr>
+<tr><td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td><td class="pos">+5.27%</td><td>0.92%</td><td class="neg">0.000</td><td class="neg">-0.28%</td><td>0.03</td><td class="pos">$7.75</td><td class="pos">+14.0% (1981)</td><td class="neg">-0.0% (2010)</td><td class="neu">2008-09-30</td><td class="neu">2008-11-30</td><td class="neu">2m</td><td class="neu">2009-05-31</td></tr>
+
+</table>
+
+
+<p class="note">CAGR = compound annual growth rate. Vol = annualised std dev of monthly returns. Sharpe = excess return over T-bills ÷ vol (dynamic T-bill rate; BIL Sharpe = 0 by construction). Max DD = maximum peak-to-trough decline. Ulcer Index = RMS of all below-peak deviations — captures depth and duration of drawdowns. $1 → = terminal value of $1 invested at period start. DD Peak / Trough = calendar dates of the worst drawdown episode. Duration = months from peak to trough. Recovery = first month wealth returned to prior peak ("Not yet" = still below peak as of period end). Data: SPY = Shiller TR spliced with SPY ETF · TLT = FRED DGS20 duration+convexity spliced with TLT ETF · IEF = FRED DGS10 duration+convexity spliced with IEF ETF · GLD = LBMA/WGC gold spot spliced with GLD ETF · BIL = FRED TB3MS spliced with BIL ETF.</p>
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

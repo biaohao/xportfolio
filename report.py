@@ -18,21 +18,15 @@ import sys
 from pathlib import Path
 
 import pandas as pd
-import yaml
 
 from metrics import compute_all_metrics
 from strategy import run_backtest
 
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 log = logging.getLogger(__name__)
 
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT, CONFIG_PATH
+
 PROCESSED = ROOT / "data" / "processed"
 RESULTS = ROOT / "results"
 
@@ -130,9 +124,16 @@ def _trim_result_to_window(result, bt_start: str | None) -> None:
 def run_all_backtests(
     frequencies: list[str],
     cfg: dict,
-) -> list[dict]:
+) -> tuple[list[dict], list]:
     """
-    Run backtests for all requested frequencies and return a list of metric dicts.
+    Run backtests for all requested frequencies.
+
+    Returns
+    -------
+    rows    : list of metric dicts (one per strategy × frequency)
+    results : list of BacktestResult objects (one per frequency), in the same
+              frequency order — can be passed directly to plot.generate_all_plots()
+              to avoid re-running the backtests a second time.
 
     SMA warm-up strategy:
       - Price data is loaded from the earliest available date (no start trim).
@@ -143,8 +144,10 @@ def run_all_backtests(
     cash_ticker = cfg["cash_proxy"]
     sma_periods: dict = cfg["strategy"]["sma_periods"]
     weights_cfg = cfg["strategy"]["weights"]
+    rebalance_period_months: int = int(cfg["strategy"].get("rebalance_period_months", 1))
     bt_start, bt_end = resolve_window(cfg)
     rows = []
+    results = []
 
     for freq in frequencies:
         sma = sma_periods.get(freq)
@@ -153,8 +156,9 @@ def run_all_backtests(
             continue
 
         log.info(
-            "Running backtest: frequency=%s  SMA=%d  window=%s → %s  (warm-up from full history)",
-            freq, sma, bt_start or "earliest", bt_end or "latest",
+            "Running backtest: frequency=%s  SMA=%d  rebalance_every=%d_months  window=%s → %s",
+            freq, sma, rebalance_period_months if freq == "monthly" else 1,
+            bt_start or "earliest", bt_end or "latest",
         )
         # Load full history up to end date — start trim happens AFTER backtest
         prices = load_prices(freq, end=bt_end)
@@ -172,6 +176,7 @@ def run_all_backtests(
             frequency=freq,
             sma_period=sma,
             weights_cfg=weights_cfg,
+            rebalance_period_months=rebalance_period_months,
         )
 
         # Trim results to the requested backtest window start
@@ -183,6 +188,8 @@ def run_all_backtests(
                 bt_start, freq,
             )
             continue
+
+        results.append(result)
 
         rf = resolve_rf(cfg, result.cash_returns)
 
@@ -196,13 +203,24 @@ def run_all_backtests(
         )
         rows.append(bh_metrics)
 
-        # Timing model metrics
+        # Timing model metrics — label includes rebalance cadence for clarity
+        reb = result.rebalance_period_months
+        if reb == 1:
+            timing_label = "Timing (GTAA monthly)"
+        elif reb == 12:
+            timing_label = "Timing (GTAA annual)"
+        elif reb == 3:
+            timing_label = "Timing (GTAA quarterly)"
+        elif reb == 6:
+            timing_label = "Timing (GTAA semi-annual)"
+        else:
+            timing_label = f"Timing (GTAA {reb}m rebal)"
         timing_metrics = compute_all_metrics(
             returns=result.returns_timing,
             rf=rf,
             frequency=freq,
             signals_df=result.signals,
-            label="Timing (GTAA)",
+            label=timing_label,
         )
         rows.append(timing_metrics)
 
@@ -219,7 +237,7 @@ def run_all_backtests(
         )
         log.info("")
 
-    return rows
+    return rows, results
 
 
 def print_summary_table(rows: list[dict]) -> None:
@@ -256,20 +274,27 @@ def print_summary_table(rows: list[dict]) -> None:
     print()
 
 
-def main(frequencies: list[str] | None = None) -> None:
-    with open(CONFIG_PATH) as fh:
-        cfg = yaml.safe_load(fh)
+def main(
+    frequencies: list[str] | None = None,
+) -> tuple[list[dict], list]:
+    """
+    Run all backtests, print the summary table, save CSV.
+
+    Returns (rows, results) so the caller (main.py) can pass the
+    BacktestResult objects directly to plot.main() without re-running.
+    """
+    cfg = load_config()
 
     if frequencies is None:
         frequencies = cfg["strategy"]["rebalance_frequencies"]
 
     RESULTS.mkdir(parents=True, exist_ok=True)
 
-    rows = run_all_backtests(frequencies, cfg)
+    rows, results = run_all_backtests(frequencies, cfg)
 
     if not rows:
         log.error("No backtest results produced.")
-        return
+        return rows, results
 
     print_summary_table(rows)
 
@@ -279,8 +304,15 @@ def main(frequencies: list[str] | None = None) -> None:
     summary_df.to_csv(out_path, index=False)
     log.info("Summary table saved → %s", out_path)
 
+    return rows, results
+
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     parser = argparse.ArgumentParser(description="Run GTAA backtests and produce summary table.")
     parser.add_argument(
         "--freq",

@@ -23,22 +23,16 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
-import yaml
 
 from metrics import cumulative_returns, drawdown_series
-from report import load_prices, resolve_rf, resolve_window
-from strategy import run_backtest
+from report import load_prices, resolve_rf, resolve_window, _trim_result_to_window
+from strategy import BacktestResult, run_backtest
 
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 log = logging.getLogger(__name__)
 
-ROOT = Path(__file__).parent
-CONFIG_PATH = ROOT / "config.yaml"
+from config import load_config, ROOT, CONFIG_PATH
+
 PLOTS_DIR = ROOT / "plots"
 
 # Consistent colour palette
@@ -198,13 +192,36 @@ def plot_signal_heatmap(
 # Orchestrator
 # ---------------------------------------------------------------------------
 
-def generate_all_plots(frequencies: list[str], cfg: dict) -> None:
+def generate_all_plots(
+    frequencies: list[str],
+    cfg: dict,
+    results: list[BacktestResult] | None = None,
+) -> None:
+    """
+    Generate all plots for the given frequencies.
+
+    Parameters
+    ----------
+    frequencies : list of frequency strings to plot.
+    cfg         : parsed config dict.
+    results     : optional list of BacktestResult objects already computed by
+                  report.run_all_backtests().  When provided the backtests are
+                  NOT re-run — prices are not re-loaded, signals are not
+                  recomputed.  When None (standalone use), backtests run here.
+    """
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    asset_names: dict = cfg["assets"]
+
+    # Build a freq → result lookup when results are passed in
+    results_by_freq: dict[str, BacktestResult] = (
+        {r.frequency: r for r in results} if results else {}
+    )
 
     cash_ticker = cfg["cash_proxy"]
     sma_periods: dict = cfg["strategy"]["sma_periods"]
     weights_cfg = cfg["strategy"]["weights"]
-    asset_names: dict = cfg["assets"]
+    rebalance_period_months: int = int(cfg["strategy"].get("rebalance_period_months", 1))
     bt_start, bt_end = resolve_window(cfg)
 
     for freq in frequencies:
@@ -213,60 +230,80 @@ def generate_all_plots(frequencies: list[str], cfg: dict) -> None:
             log.warning("No SMA period configured for '%s'; skipping plots.", freq)
             continue
 
-        log.info("Generating plots: frequency=%s  SMA=%d  window=%s → %s",
-                 freq, sma, bt_start or "earliest", bt_end or "latest")
-        # Load full history up to end — start trim applied after backtest (warm-up)
-        prices = load_prices(freq, end=bt_end)
+        if freq in results_by_freq:
+            # Reuse the already-computed result — no backtest re-run
+            result = results_by_freq[freq]
+            log.info("Generating plots: frequency=%s  (reusing backtest result)", freq)
+        else:
+            # Standalone mode: run the backtest now
+            reb = rebalance_period_months if freq == "monthly" else 1
+            log.info(
+                "Generating plots: frequency=%s  SMA=%d  rebalance_every=%d_months  window=%s → %s",
+                freq, sma, reb, bt_start or "earliest", bt_end or "latest",
+            )
+            prices = load_prices(freq, end=bt_end)
+            if cash_ticker not in prices.columns:
+                log.warning("Cash proxy '%s' not found in %s data; skipping.", cash_ticker, freq)
+                continue
+            result = run_backtest(
+                prices_df=prices,
+                cash_col=cash_ticker,
+                frequency=freq,
+                sma_period=sma,
+                weights_cfg=weights_cfg,
+                rebalance_period_months=rebalance_period_months,
+            )
+            _trim_result_to_window(result, bt_start)
 
-        if cash_ticker not in prices.columns:
-            log.warning("Cash proxy '%s' not found in %s data; skipping.", cash_ticker, freq)
-            continue
-
-        result = run_backtest(
-            prices_df=prices,
-            cash_col=cash_ticker,
-            frequency=freq,
-            sma_period=sma,
-            weights_cfg=weights_cfg,
-        )
-
-        # Trim to backtest window start (after SMA warm-up over full history)
-        from report import _trim_result_to_window
-        _trim_result_to_window(result, bt_start)
         if result.returns_bh.empty:
-            log.warning("No data after trimming to %s for %s; skipping plots.", bt_start, freq)
+            log.warning("No data for %s; skipping plots.", freq)
             continue
 
+        reb = result.rebalance_period_months
+        suffix = f"{freq}_reb{reb}m"
         plot_equity_curves(
             result.returns_bh, result.returns_timing, freq,
-            PLOTS_DIR / f"equity_curve_{freq}.png",
+            PLOTS_DIR / f"equity_curve_{suffix}.png",
         )
         plot_drawdowns(
             result.returns_bh, result.returns_timing, freq,
-            PLOTS_DIR / f"drawdown_{freq}.png",
+            PLOTS_DIR / f"drawdown_{suffix}.png",
         )
         plot_annual_returns(
             result.returns_bh, result.returns_timing, freq,
-            PLOTS_DIR / f"yearly_returns_{freq}.png",
+            PLOTS_DIR / f"yearly_returns_{suffix}.png",
         )
         plot_signal_heatmap(
             result.signals, asset_names, freq,
-            PLOTS_DIR / f"asset_signals_{freq}.png",
+            PLOTS_DIR / f"asset_signals_{suffix}.png",
         )
         log.info("")
 
 
-def main(frequencies: list[str] | None = None) -> None:
-    with open(CONFIG_PATH) as fh:
-        cfg = yaml.safe_load(fh)
+def main(
+    frequencies: list[str] | None = None,
+    results: list[BacktestResult] | None = None,
+) -> None:
+    """
+    Generate plots for all frequencies.
+
+    results: optional BacktestResult list from report.main() — when provided
+             the backtests are not re-run.
+    """
+    cfg = load_config()
 
     if frequencies is None:
         frequencies = cfg["strategy"]["rebalance_frequencies"]
 
-    generate_all_plots(frequencies, cfg)
+    generate_all_plots(frequencies, cfg, results=results)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s  %(levelname)-8s  %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     parser = argparse.ArgumentParser(description="Generate GTAA backtest plots.")
     parser.add_argument(
         "--freq",

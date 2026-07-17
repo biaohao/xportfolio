@@ -139,10 +139,12 @@ def build_daily_splice(gcf: pd.Series, gld: pd.Series) -> pd.Series:
 
 def build_monthly_gold(monthly_raw: pd.Series) -> pd.Series:
     """
-    Extract 1973-01 onward (post-Bretton-Woods free-float era).
-    Return as month-end indexed price series suitable for splicing.
+    Extract 1963-01 onward so there are enough warm-up months for a
+    10-month SMA before any 1973+ backtest start date.
+    (Pre-1971 prices are Bretton-Woods fixed; they still provide valid
+    SMA seed values even though the free-float era begins Aug 1971.)
     """
-    cutoff = pd.Timestamp("1973-01-31")
+    cutoff = pd.Timestamp("1963-01-31")
     s = monthly_raw[monthly_raw.index >= cutoff].copy()
     s.name = "Gold"
     return s

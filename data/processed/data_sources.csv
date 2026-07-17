@@ -4,5 +4,7 @@ EFA,ETF only,2001-08-31,,
 IEF,Long-history + ETF splice,2002-07-31,1962-02-28,2002-07-31
 GSG,ETF only,2006-07-31,,
 VNQ,ETF only,2004-09-30,,
-GLD,Long-history + ETF splice,2004-11-30,1973-01-31,2004-11-30
+TLT,Long-history + ETF splice,2002-07-31,1962-02-28,2002-07-31
+BTC,Long-history + ETF splice,2014-09-30,2010-08-31,2014-09-30
+GLD,Long-history + ETF splice,2004-11-30,1963-01-31,2004-11-30
 BIL,Long-history + ETF splice,2007-05-31,1934-01-31,2007-05-31

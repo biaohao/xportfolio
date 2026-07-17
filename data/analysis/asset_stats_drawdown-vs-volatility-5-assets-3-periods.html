@@ -1,0 +1,352 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Drawdown vs Volatility — 5 Assets × 3 Periods</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#fff;color:#1f2328;padding:28px 16px 56px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.subtitle{color:#57606a;font-size:12px;margin-bottom:24px;line-height:1.5}
+h2{font-size:13.5px;font-weight:700;margin:32px 0 10px;padding-bottom:5px;border-bottom:2px solid #e5e7eb;text-transform:uppercase;letter-spacing:.04em}
+h3{font-size:12px;font-weight:700;color:#57606a;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.05em}
+table{border-collapse:collapse;width:100%;font-size:11.5px;margin-bottom:6px}
+th{background:#f7f8fa;border:1px solid #e5e7eb;padding:5px 8px;text-align:right;font-weight:600;color:#57606a;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+th:first-child{text-align:left;min-width:165px}
+td{border:1px solid #e5e7eb;padding:5px 8px;text-align:right;white-space:nowrap}
+td:first-child{text-align:left;font-weight:600}
+tr:hover td{background:#f7f8fa}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.neg{color:#cf222e;font-weight:600}
+.warn{color:#b45309;font-weight:600}
+.neu{color:#57606a}
+.hi{color:#1a7f37;font-weight:600}
+.bold{font-weight:700}
+.bar-section{margin:14px 0 28px}
+.bar-row{display:flex;align-items:center;margin:3px 0;gap:8px;font-size:11px}
+.bar-label{width:155px;flex-shrink:0;color:#1f2328;font-weight:600;text-align:right;padding-right:4px}
+.bar-track{flex:1;background:#f0f1f3;border-radius:3px;height:14px;position:relative}
+.bar-fill{height:14px;border-radius:3px;position:absolute;left:0;top:0}
+.bar-val{width:54px;flex-shrink:0;text-align:left;color:#57606a;font-size:10.5px}
+.bar-group-label{font-size:11px;font-weight:700;color:#57606a;margin:10px 0 3px;text-transform:uppercase;letter-spacing:.04em}
+.ratio-hi{background:#fef9c3}
+.ratio-lo{background:#f0fdf4}
+.ratio-warn{background:#fff7ed}
+.insight{background:#f7f8fa;border:1px solid #e5e7eb;border-left:3px solid #3b82d4;border-radius:4px;padding:12px 14px;font-size:12px;color:#1f2328;margin:14px 0 4px;line-height:1.6}
+.insight b{color:#1f2328}
+.insight ul{margin:4px 0 0 16px}
+.insight li{margin-bottom:2px}
+.note{font-size:11px;color:#57606a;font-style:italic;margin:10px 0 0;line-height:1.5}
+footer{margin-top:48px;padding-top:12px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#57606a}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Drawdown vs Volatility — 5 Assets × 3 Periods</h1>
+<p class="subtitle">
+  <b>Five metrics per asset per period:</b>
+  Average drawdown (all months) · Average drawdown when <em>in</em> drawdown ·
+  Max drawdown · % months spent below prior peak · Annualised volatility ·
+  Avg DD / Vol ratio (pain per unit of vol).<br />
+  Assets: S&amp;P 500 · 20yr Bond (TLT) · 10yr Bond (IEF) · Gold (GLD) · T-Bills (BIL).<br />
+  Periods: 1973–Jun 2026 · 2000–Jun 2026 · 1973–2012. Monthly total-return series.
+</p>
+
+
+<h2>Period 1 — 1973–Jun 2026  (53 years)</h2>
+
+<h3>Drawdown &amp; Volatility Statistics</h3>
+<table>
+  <tr>
+    <th>Asset</th>
+    <th>Avg DD<br />(all months)</th>
+    <th>Avg DD<br />(when in DD)</th>
+    <th>Max DD</th>
+    <th>% Time<br />in DD</th>
+    <th>Vol (ann.)</th>
+    <th title="|Avg DD| ÷ Vol — how many vol-units of average drawdown">Avg DD / Vol</th>
+    <th>Ulcer<br />Index</th>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#2563eb"></span>S&amp;P 500</td>
+    <td class="neg">−7.31%</td><td class="neg">−11.50%</td>
+    <td class="neg">−50.78%</td><td class="warn">63.6%</td>
+    <td>14.12%</td><td class="ratio-warn bold">0.52</td><td class="warn">12.68</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT)</td>
+    <td class="neg">−7.65%</td><td class="neg">−9.84%</td>
+    <td class="neg">−47.61%</td><td class="warn">77.7%</td>
+    <td>12.06%</td><td class="ratio-hi bold">0.63</td><td class="warn">12.99</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF)</td>
+    <td class="warn">−3.36%</td><td class="warn">−4.88%</td>
+    <td class="warn">−23.15%</td><td class="warn">68.8%</td>
+    <td>7.70%</td><td class="ratio-lo bold">0.44</td><td class="hi">5.66</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td>
+    <td class="neg" style="font-weight:700">−28.62%</td><td class="neg" style="font-weight:700">−32.18%</td>
+    <td class="neg" style="font-weight:700">−62.09%</td><td class="neg" style="font-weight:700">88.9%</td>
+    <td>18.47%</td><td class="neg bold">1.55</td><td class="neg" style="font-weight:700">34.64</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td>
+    <td class="hi">−0.03%</td><td class="hi">−0.16%</td>
+    <td class="hi">−0.42%</td><td class="hi">20.4%</td>
+    <td>0.95%</td><td class="ratio-lo bold">0.03</td><td class="hi">0.09</td>
+  </tr>
+</table>
+
+<h3>Bar Chart — Average Drawdown vs Volatility</h3>
+<div class="bar-section">
+  <div class="bar-group-label">Annualised Volatility</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:74.3%;background:#2563eb99"></div></div><span class="bar-val">14.12%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:63.5%;background:#7c3aed99"></div></div><span class="bar-val">12.06%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:40.5%;background:#16a34a99"></div></div><span class="bar-val">7.70%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:97.2%;background:#d9770699"></div></div><span class="bar-val">18.47%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:5.0%;background:#9ca3af99"></div></div><span class="bar-val">0.95%</span></div>
+
+  <div class="bar-group-label" style="margin-top:14px">|Average Drawdown| (all months)</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:11.8%;background:#2563eb"></div></div><span class="bar-val">7.31%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:12.3%;background:#7c3aed"></div></div><span class="bar-val">7.65%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:5.4%;background:#16a34a"></div></div><span class="bar-val">3.36%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:46.1%;background:#d97706"></div></div><span class="bar-val">28.62%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:0.05%;background:#9ca3af"></div></div><span class="bar-val">0.03%</span></div>
+</div>
+
+<div class="insight">
+  <b>1973–2026 takeaway:</b>
+  <ul>
+    <li>Gold's avg drawdown (−28.6%) is <b>1.55× its annual vol</b> — far above every other asset. Despite similar vol to the S&amp;P 500, gold spent 89% of months below a prior peak, driven by the 19-year secular bear 1980–2001.</li>
+    <li>TLT carries <b>more average drawdown per unit of vol (0.63) than the S&amp;P 500 (0.52)</b>, despite lower vol — a consequence of the prolonged 2020–2024 rate-hike drawdown.</li>
+    <li>IEF has the cleanest ratio (0.44): moderate vol, shallow drawdowns, least "drag" per vol-unit.</li>
+    <li>T-Bills: trivially low drawdown and vol; ratio of 0.03 confirms cash is near-permanently at a "peak."</li>
+  </ul>
+</div>
+
+
+<h2>Period 2 — 2000–Jun 2026  (26 years)</h2>
+
+<h3>Drawdown &amp; Volatility Statistics</h3>
+<table>
+  <tr>
+    <th>Asset</th>
+    <th>Avg DD<br />(all months)</th>
+    <th>Avg DD<br />(when in DD)</th>
+    <th>Max DD</th>
+    <th>% Time<br />in DD</th>
+    <th>Vol (ann.)</th>
+    <th title="|Avg DD| ÷ Vol">Avg DD / Vol</th>
+    <th>Ulcer<br />Index</th>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#2563eb"></span>S&amp;P 500</td>
+    <td class="neg">−9.98%</td><td class="neg">−14.43%</td>
+    <td class="neg">−50.78%</td><td class="warn">69.2%</td>
+    <td>15.19%</td><td class="ratio-warn bold">0.66</td><td class="warn">15.68</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT)</td>
+    <td class="neg">−11.61%</td><td class="neg">−13.83%</td>
+    <td class="neg">−47.61%</td><td class="neg">84.0%</td>
+    <td>13.09%</td><td class="neg bold">0.89</td><td class="neg">17.48</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF)</td>
+    <td class="warn">−4.38%</td><td class="warn">−5.76%</td>
+    <td class="warn">−23.15%</td><td class="warn">76.1%</td>
+    <td>6.70%</td><td class="ratio-hi bold">0.65</td><td class="warn">7.01</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td>
+    <td class="neg">−11.70%</td><td class="neg">−14.77%</td>
+    <td class="neg">−42.91%</td><td class="neg">79.2%</td>
+    <td>16.14%</td><td class="ratio-warn bold">0.73</td><td class="warn">17.30</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td>
+    <td class="hi">−0.06%</td><td class="hi">−0.16%</td>
+    <td class="hi">−0.42%</td><td class="warn">41.2%</td>
+    <td>0.58%</td><td class="ratio-warn bold">0.11</td><td class="hi">0.13</td>
+  </tr>
+</table>
+
+<h3>Bar Chart — Average Drawdown vs Volatility</h3>
+<div class="bar-section">
+  <div class="bar-group-label">Annualised Volatility</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:94.3%;background:#2563eb99"></div></div><span class="bar-val">15.19%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:81.2%;background:#7c3aed99"></div></div><span class="bar-val">13.09%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:41.6%;background:#16a34a99"></div></div><span class="bar-val">6.70%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#d9770699"></div></div><span class="bar-val">16.14%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:3.6%;background:#9ca3af99"></div></div><span class="bar-val">0.58%</span></div>
+
+  <div class="bar-group-label" style="margin-top:14px">|Average Drawdown| (all months)</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:25.4%;background:#2563eb"></div></div><span class="bar-val">9.98%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:29.6%;background:#7c3aed"></div></div><span class="bar-val">11.61%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:11.2%;background:#16a34a"></div></div><span class="bar-val">4.38%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:29.8%;background:#d97706"></div></div><span class="bar-val">11.70%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:0.15%;background:#9ca3af"></div></div><span class="bar-val">0.06%</span></div>
+</div>
+
+<div class="insight">
+  <b>2000–2026 takeaway:</b>
+  <ul>
+    <li>TLT now has the <b>highest avg drawdown (−11.6%) and highest Avg DD/Vol ratio (0.89)</b> of any risky asset — the 2020–2024 rate-hike cycle crushed long bonds, which spent 84% of months below a prior peak.</li>
+    <li>Gold (0.73) and S&amp;P 500 (0.66) are close in ratio — but gold delivers far higher returns over this window, so the "pain" is better rewarded.</li>
+    <li>IEF vs TLT: same vol family but IEF ratio (0.65) &lt; TLT (0.89) — the shorter duration cushions the 2022 rate shock materially.</li>
+    <li>T-Bills spent 41% of months in a small drawdown (ZIRP era 2009–2015) — unusual for cash.</li>
+  </ul>
+</div>
+
+
+<h2>Period 3 — 1973–2012  (40 years, Faber paper window)</h2>
+
+<h3>Drawdown &amp; Volatility Statistics</h3>
+<table>
+  <tr>
+    <th>Asset</th>
+    <th>Avg DD<br />(all months)</th>
+    <th>Avg DD<br />(when in DD)</th>
+    <th>Max DD</th>
+    <th>% Time<br />in DD</th>
+    <th>Vol (ann.)</th>
+    <th title="|Avg DD| ÷ Vol">Avg DD / Vol</th>
+    <th>Ulcer<br />Index</th>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#2563eb"></span>S&amp;P 500</td>
+    <td class="neg">−8.80%</td><td class="neg">−12.76%</td>
+    <td class="neg">−50.78%</td><td class="warn">69.0%</td>
+    <td>14.07%</td><td class="ratio-warn bold">0.63</td><td class="warn">14.29</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT)</td>
+    <td class="warn">−4.16%</td><td class="warn">−5.71%</td>
+    <td class="warn">−22.59%</td><td class="warn">72.9%</td>
+    <td>11.64%</td><td class="ratio-lo bold">0.36</td><td class="hi">6.53</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF)</td>
+    <td class="hi">−2.10%</td><td class="hi">−3.37%</td>
+    <td class="hi">−15.41%</td><td class="warn">62.3%</td>
+    <td>8.06%</td><td class="ratio-lo bold">0.26</td><td class="hi">3.48</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td>
+    <td class="neg" style="font-weight:700">−31.95%</td><td class="neg" style="font-weight:700">−35.58%</td>
+    <td class="neg" style="font-weight:700">−62.09%</td><td class="neg" style="font-weight:700">89.8%</td>
+    <td>19.27%</td><td class="neg bold">1.66</td><td class="neg" style="font-weight:700">37.67</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td>
+    <td class="hi">−0.01%</td><td class="hi">−0.08%</td>
+    <td class="hi">−0.28%</td><td class="hi">10.2%</td>
+    <td>0.92%</td><td class="ratio-lo bold">0.01</td><td class="hi">0.03</td>
+  </tr>
+</table>
+
+<h3>Bar Chart — Average Drawdown vs Volatility</h3>
+<div class="bar-section">
+  <div class="bar-group-label">Annualised Volatility</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:73.0%;background:#2563eb99"></div></div><span class="bar-val">14.07%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:60.4%;background:#7c3aed99"></div></div><span class="bar-val">11.64%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:41.9%;background:#16a34a99"></div></div><span class="bar-val">8.06%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#d9770699"></div></div><span class="bar-val">19.27%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:4.8%;background:#9ca3af99"></div></div><span class="bar-val">0.92%</span></div>
+
+  <div class="bar-group-label" style="margin-top:14px">|Average Drawdown| (all months)</div>
+  <div class="bar-row"><span class="bar-label">S&amp;P 500</span><div class="bar-track"><div class="bar-fill" style="width:13.8%;background:#2563eb"></div></div><span class="bar-val">8.80%</span></div>
+  <div class="bar-row"><span class="bar-label">20yr Bond (TLT)</span><div class="bar-track"><div class="bar-fill" style="width:6.5%;background:#7c3aed"></div></div><span class="bar-val">4.16%</span></div>
+  <div class="bar-row"><span class="bar-label">10yr Bond (IEF)</span><div class="bar-track"><div class="bar-fill" style="width:3.3%;background:#16a34a"></div></div><span class="bar-val">2.10%</span></div>
+  <div class="bar-row"><span class="bar-label">Gold (GLD)</span><div class="bar-track"><div class="bar-fill" style="width:50.1%;background:#d97706"></div></div><span class="bar-val">31.95%</span></div>
+  <div class="bar-row"><span class="bar-label">T-Bills (BIL)</span><div class="bar-track"><div class="bar-fill" style="width:0.02%;background:#9ca3af"></div></div><span class="bar-val">0.01%</span></div>
+</div>
+
+<div class="insight">
+  <b>1973–2012 (Faber window) takeaway:</b>
+  <ul>
+    <li>Gold's 1980–2001 secular bear dominates: avg drawdown −32%, ratio 1.66 — <b>for every 1% of vol, gold carried 1.66% of average drawdown pain</b>. This is the main reason Faber's timing rule adds so much value on gold.</li>
+    <li>TLT had its <b>best drawdown profile</b> in this window (ratio 0.36 vs 0.89 in 2000–2026), reflecting the 40-year bond bull market. Vol ≈ 12% but avg drawdown only −4.2%.</li>
+    <li>IEF is the standout — lowest avg drawdown of any risky asset (−2.1%), lowest ratio (0.26): exceptionally efficient risk. The 1980–2012 rate-decline environment was ideal for short/intermediate bonds.</li>
+    <li>S&amp;P 500 ratio (0.63) is meaningfully above its 1973–2026 full-period value (0.52): includes dot-com + GFC without the bull market of 2013–2026 to offset.</li>
+  </ul>
+</div>
+
+
+<h2>Cross-Period Summary — Avg DD / Vol Ratio</h2>
+<p style="font-size:12px;color:#57606a;margin-bottom:10px">
+  Higher ratio = more drawdown pain per unit of volatility. A ratio below 0.5 is generally favourable;
+  above 1.0 signals that the asset's drawdowns are disproportionate to its day-to-day swings.
+</p>
+<table>
+  <tr>
+    <th>Asset</th>
+    <th>1973–Jun 2026</th>
+    <th>2000–Jun 2026</th>
+    <th>1973–2012</th>
+    <th>Direction →</th>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#2563eb"></span>S&amp;P 500</td>
+    <td class="ratio-warn bold neu">0.52</td>
+    <td class="ratio-warn bold warn">0.66</td>
+    <td class="ratio-warn bold warn">0.63</td>
+    <td class="neu" style="font-size:11px">Worsened since 2000</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#7c3aed"></span>20yr Bond (TLT)</td>
+    <td class="ratio-hi bold warn">0.63</td>
+    <td class="ratio-hi bold neg">0.89</td>
+    <td class="ratio-lo bold hi">0.36</td>
+    <td class="neg" style="font-size:11px">Dramatically worse since 2000 (rate risk)</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#16a34a"></span>10yr Bond (IEF)</td>
+    <td class="ratio-lo bold neu">0.44</td>
+    <td class="ratio-hi bold warn">0.65</td>
+    <td class="ratio-lo bold hi">0.26</td>
+    <td class="warn" style="font-size:11px">Worsened since 2000 (rate hikes)</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#d97706"></span>Gold (GLD)</td>
+    <td class="neg bold">1.55</td>
+    <td class="ratio-warn bold warn">0.73</td>
+    <td class="neg bold">1.66</td>
+    <td class="hi" style="font-size:11px">Much improved in 2000–2026 (gold bull)</td>
+  </tr>
+  <tr>
+    <td><span class="dot" style="background:#9ca3af"></span>T-Bills (BIL)</td>
+    <td class="ratio-lo bold hi">0.03</td>
+    <td class="ratio-lo bold neu">0.11</td>
+    <td class="ratio-lo bold hi">0.01</td>
+    <td class="neu" style="font-size:11px">Always near-zero (near-riskless)</td>
+  </tr>
+</table>
+
+<div class="insight">
+  <b>Cross-period key observations:</b>
+  <ul>
+    <li><b>Gold is regime-dependent:</b> ratio flips from ~1.6 (1973–2012, plagued by 19-year bear) to 0.73 (2000–2026, sustained bull). Timing the regime matters enormously — exactly what SMA-10 catches.</li>
+    <li><b>Long bonds deteriorated sharply:</b> TLT's ratio tripled from 0.36 (1973–2012 bond bull) to 0.89 (2000–2026), making TLT the most painful-per-vol-unit asset in the modern era. IEF followed the same direction but stayed below 0.65 thanks to shorter duration.</li>
+    <li><b>The S&amp;P 500 is the most stable</b> across periods (0.52–0.66): two large bear markets, two long recoveries, but the ratio stays in a relatively narrow band.</li>
+    <li><b>The "ideal" asset</b> for a buy-and-hold investor is low avg DD <em>and</em> low ratio — only IEF in 1973–2012 achieves both (−2.1%, 0.26). In 2000–2026 no asset achieves this cleanly; the closest is IEF (−4.4%, 0.65).</li>
+  </ul>
+</div>
+
+<p class="note">
+  <b>Definitions:</b>
+  Avg DD (all months) = arithmetic mean of the monthly drawdown series (0 when at a peak, negative otherwise) — captures both depth and duration of underwater periods.
+  Avg DD (when in DD) = same but restricted to months strictly below prior peak — measures the typical severity of an ongoing drawdown episode.
+  Avg DD / Vol = |average drawdown| divided by annualised volatility — a dimensionless "pain-per-vol" ratio. Values &gt;1 mean the average drawdown exceeds one year of annualised volatility.
+  Ulcer Index = √(mean of squared drawdowns in %) — penalises long deep troughs more than brief dips.
+  All calculations on monthly total-return series, no costs or taxes.
+</p>
+
+</div>
+<footer>Made with IBM Bob</footer>
+</body>
+</html>

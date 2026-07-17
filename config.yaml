@@ -14,10 +14,57 @@ assets:
   IEF: "US 10-Year Bonds"
   GSG: "Commodities (GSCI)"
   VNQ: "US REITs (NAREIT)"
+  TLT: "US 20-Year Bonds (Long Duration)"
+  BTC: "Bitcoin"
   GLD: "Gold (SPDR)"
 
 # T-bill proxy used as the cash return when a signal is 0
 cash_proxy: "BIL"
+
+# ----------------------------------------------------------
+# Long-history splice sources
+# ----------------------------------------------------------
+# Maps a ticker to the CSV file and column name that provides pre-ETF history.
+# splice_data.py reads this to build the long-history + ETF splice for the
+# monthly backtest.  To add a new spliced asset, add an entry here — no code
+# changes needed.
+#
+# Fields per entry:
+#   file   : path to the CSV (relative to project root)
+#   column : column name inside that CSV that holds the price/return index
+#
+# Assets NOT listed here are included from their ETF launch date only.
+long_history_sources:
+  SPY:
+    file: "data/raw/longhistory/sp500_shiller.csv"
+    column: "SP500_TR"
+  IEF:
+    file: "data/raw/longhistory/bonds_fred.csv"
+    column: "BONDS_TR"
+  TLT:
+    file: "data/raw/longhistory/tlt_proxy_dgs20.csv"
+    column: "TLT_PROXY"
+  GLD:
+    file: "data/processed/gold_monthly.csv"
+    column: "Gold"
+  BTC:
+    file: "data/raw/longhistory/btc_coinmetrics.csv"
+    column: "BTC_TR"
+  BIL:
+    file: "data/raw/longhistory/tbill_fred.csv"
+    column: "TBILL_TR"
+
+# ----------------------------------------------------------
+# Data settings
+# ----------------------------------------------------------
+# ----------------------------------------------------------
+# Ticker overrides for Yahoo Finance
+# ----------------------------------------------------------
+# Some assets use a config key that differs from the Yahoo Finance ticker symbol
+# (e.g. BTC → BTC-USD).  List them here; any key not present falls back to
+# using the config key directly as the Yahoo ticker.
+etf_ticker_overrides:
+  BTC: "BTC-USD"
 
 # ----------------------------------------------------------
 # Data settings
@@ -57,6 +104,16 @@ strategy:
     - monthly
     - weekly
     - daily
+
+  # How many months between full portfolio rebalances (equal-weight true-up).
+  # 1  = Faber original — rebalance every month-end (current default)
+  # 3  = quarterly
+  # 6  = semi-annual
+  # 12 = annual (year-end only)
+  # Applies to the monthly frequency only. Entry/exit signals still fire
+  # every month on the SMA signal; only the equal-weight normalisation across
+  # all invested assets is deferred to every N months.
+  rebalance_period_months: 1
 
   # Equal weight for all assets (1/N).
   # Override with a dict of ticker→weight if unequal weighting is desired,
