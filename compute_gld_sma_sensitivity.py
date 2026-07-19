@@ -168,20 +168,21 @@ def plot_chart(slug: str, sma: int,
                        f"Vol {s_t['vol']:.1f}%  "
                        f"MaxDD {s_t['maxdd']:.1f}%")
 
-    # Entry/Exit dots on the TIMING equity curve
-    if len(wi_entry):
-        ax1.scatter(wi_entry.index, wi_entry.values,
+    # Entry/Exit dots anchored on the B&H (GLD price) equity curve
+    wi_bh_entry = wi_bh.reindex(entry_dates).dropna()
+    wi_bh_exit  = wi_bh.reindex(exit_dates).dropna()
+    if len(wi_bh_entry):
+        ax1.scatter(wi_bh_entry.index, wi_bh_entry.values,
                     color=GREEN, s=40, zorder=6, marker="o",
-                    label=f"Entry ({len(wi_entry)})")
-    if len(wi_exit):
-        ax1.scatter(wi_exit.index, wi_exit.values,
+                    label=f"Entry ({len(wi_bh_entry)})")
+    if len(wi_bh_exit):
+        ax1.scatter(wi_bh_exit.index, wi_bh_exit.values,
                     color=RED,   s=40, zorder=6, marker="o",
-                    label=f"Exit ({len(wi_exit)})")
+                    label=f"Exit ({len(wi_bh_exit)})")
 
     ax1.set_title(
         f"GLD — SMA-{sma} Timing  |  {win_title}\n"
-        f"Green dots = entry (price crosses above SMA-{sma}) · "
-        f"Red dots = exit (price crosses below SMA-{sma})",
+        f"Dots on B&H curve — green = entry · red = exit  (SMA-{sma} crossover)",
         fontsize=10, fontweight="bold", pad=8)
     ax1.set_ylabel("Growth of $1 (log)", fontsize=9)
     ax1.yaxis.set_major_formatter(mticker.FuncFormatter(
@@ -479,7 +480,7 @@ def main() -> None:
 
 <h1>GLD — SMA Timing Sensitivity: SMA-6 to SMA-15</h1>
 <p class="sub">Gold buy &amp; hold vs SMA-N timing across 3 periods.
-Green dots = entry (price crosses above SMA) · Red dots = exit (price crosses below SMA).
+Green/red dots on the B&amp;H (GLD price) curve — green = entry · red = exit.
 T-bill cash when out of market · 1-month lag · no look-ahead.</p>
 
 <p class="meta">
@@ -505,7 +506,7 @@ The entry/exit tables below show exactly when each SMA fired.
   <p style="margin-top:6px"><b>Data:</b> Kitco/GitHub monthly gold spot (1963–) spliced with GLD ETF (Nov 2004–).
      Cash: FRED TB3MS 3-month T-bill spliced with BIL ETF.</p>
   <p style="margin-top:6px"><b>Entry dot:</b> signal transitions from 0→1 (invested).
-     <b>Exit dot:</b> signal transitions from 1→0 (exit to T-bills). Dots plotted on the timing equity curve.</p>
+     <b>Exit dot:</b> signal transitions from 1→0 (exit to T-bills). Dots plotted on the B&amp;H (GLD price) equity curve so you can see the exact price level at which each signal fired.</p>
 </div>
 
 </div>
